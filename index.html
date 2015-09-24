@@ -2,13 +2,15 @@
 <html>
     <head>
         <title>jsCheck</title>
+        <link href="./jquery-ui-1.11.4.custom/jquery-ui.css" rel="stylesheet">
         <style>
             body {
                 margin: 0px;
                 background-color: #333;
+                font-size: 14px;
             }
             
-            .siteLight {
+            .urlObjectLight {
                 float: left;
                 width: 20px;
                 height: 20px;
@@ -19,50 +21,114 @@
     </head>
     
     <body>
-        <div class="siteLight" id="site1" title="jordanhall.co.uk">
         
+        <div id="urlObjects">
         </div>
         
         <script>
         
             window.$ = window.jQuery = require('./jquery-2.1.4.min.js');
             
-            function getErrorText(status)
+            require('./jquery-ui-1.11.4.custom/jquery-ui.js');
+            
+            function getErrorText(status, statusText)
             {
-                var text = status;
+                var errorText = status;
                 
                 switch (status)
                 {
-                    case 0: text = 'connection error'; break;
+                    case 0: errorText = 'Connection error'; break;
                         
                 }
                 
-                return text;
+                errorText += ' (' + statusText + ')'
+                
+                return errorText;
             }
             
-            function checkSite()
+            function getRequestDelay()
             {
+                var requestDelaySeconds = 5 + Math.floor(Math.random()*5);
+                
+                return requestDelaySeconds * 1000;
+            }
+            
+            function checkUrlObject(index, urlObject)
+            {
+                var titlePrefix = '';
+                titlePrefix += 'Site name: ' + urlObject.siteName + '<br/>'
+                titlePrefix += 'Page name: ' + urlObject.pageName + '<br/>' 
+                titlePrefix += 'URL: ' + urlObject.url + '<br/><hr/>';
+                
+                if (!$('#urlObject'+index).length) {
+                    $('#urlObjects').append('<div class="urlObjectLight" id="urlObject'+index+'" title="'+titlePrefix+'Not yet checked">');
+                }
+                
+                if (typeof urlObject.failures == 'undefined') {
+                    urlObject.failures = 0;
+                }
+                
+                if (typeof urlObject.startedDate == 'undefined') {
+                    urlObject.startedDate = null;
+                }
+                
                 $.ajax({ 
-                    url: "http://www.jordanrhgdrhdrhall.co.uk/", 
+                    url: urlObject.url, 
+                    cache: false,
                     timeout: 3000
                 }).fail(function(jqXHR, textStatus, errorThrown)
                 {
-                    $('#site1.siteLight').css('background-color', '#c00');
-                    $('#site1.siteLight').attr('title', 'jordanhall.co.uk - '+getErrorText(jqXHR.status));
-                    console.log(jqXHR);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                    urlObject.failures++;
+                    if (urlObject.startedDate===null) urlObject.startedDate = Date();
+                    
+                    var title = titlePrefix;
+                    title += 'Problem: '+ getErrorText(jqXHR.status, jqXHR.statusText) + '<br/>';
+                    title += 'Ocurrences: ' + urlObject.failures + '<br/>';
+                    title += 'Started: ' + urlObject.startedDate + '<br/>';
+                    
+                    var colour = '#c00';
+                    
+                    if (urlObject.failures<5) {
+                        colour = '#FFA500'
+                    }
+                    
+                    $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
+                    $('#urlObject'+index+'.urlObjectLight').attr('title', title);
+                    
                 }).done(function(data){
-                    $('#site1.siteLight').css('background-color', '#0c0');
-                    $('#site1.siteLight').attr('title', 'jordanhall.co.uk - online');
+                    
+                    urlObject.failures = 0;
+                    urlObject.startedDate = null;
+                    
+                    var title = titlePrefix + 'No problems detected.';
+                    
+                    $('#urlObject'+index+'.urlObjectLight').css('background-color', '#0c0');
+                    $('#urlObject'+index+'.urlObjectLight').attr('title', title);
                 }).always(function()
                 {
-                    setTimeout(function() { checkSite(); }, 3000);
+                    setTimeout(function() { checkUrlObject(index, urlObject); }, getRequestDelay());
                 });
             }
             
             $(document).ready(function(){
-               checkSite(); 
+                
+                $( document ).tooltip({ 
+                    content: function () {
+                        return $(this).prop('title');
+                    } 
+                });
+                
+                $.getJSON( "config/urls.json", function( urlObjects ) {
+                    
+                    for (var i = 0; i < urlObjects.length; i++) {
+                        
+                        var urlObject = urlObjects[i];
+                        
+                        checkUrlObject(i, urlObject);
+                        
+                    }
+                    
+                });
             });
             
         </script>
