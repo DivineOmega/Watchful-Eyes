@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>jsCheck</title>
+        <style>
+            body {
+                margin: 0px;
+                background-color: #333;
+            }
+            
+            .siteLight {
+                float: left;
+                width: 20px;
+                height: 20px;
+                background-color: #ccc;
+                margin: 1px;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="siteLight" id="site1" title="jordanhall.co.uk">
+        
+        </div>
+        
+        <script>
+        
+            window.$ = window.jQuery = require('./jquery-2.1.4.min.js');
+            
+            function getErrorText(status)
+            {
+                var text = status;
+                
+                switch (status)
+                {
+                    case 0: text = 'connection error'; break;
+                        
+                }
+                
+                return text;
+            }
+            
+            function checkSite()
+            {
+                $.ajax({ 
+                    url: "http://www.jordanrhgdrhdrhall.co.uk/", 
+                    timeout: 3000
+                }).fail(function(jqXHR, textStatus, errorThrown)
+                {
+                    $('#site1.siteLight').css('background-color', '#c00');
+                    $('#site1.siteLight').attr('title', 'jordanhall.co.uk - '+getErrorText(jqXHR.status));
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                }).done(function(data){
+                    $('#site1.siteLight').css('background-color', '#0c0');
+                    $('#site1.siteLight').attr('title', 'jordanhall.co.uk - online');
+                }).always(function()
+                {
+                    setTimeout(function() { checkSite(); }, 3000);
+                });
+            }
+            
+            $(document).ready(function(){
+               checkSite(); 
+            });
+            
+        </script>
+        
+    </body>
+
+</html> 
