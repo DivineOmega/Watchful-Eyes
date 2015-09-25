@@ -66,6 +66,11 @@
                 return 3;
             }
             
+            function getReportingFrequencyMultiplier()
+            {
+                return 10;
+            }
+            
             function getErrorText(status, statusText)
             {
                 var errorText = status;
@@ -132,7 +137,7 @@
                     if (urlObject.failures == getFailureCountThreshold()) {
                         reportFailure(urlObject, title);
                     }
-                    else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold()*10) == 0) {
+                    else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold()*getReportingFrequencyMultiplier()) == 0) {
                         reportFailure(urlObject, title);
                     }
                     
@@ -188,7 +193,7 @@
                         if (urlObject.failures == getFailureCountThreshold()) {
                             reportFailure(urlObject, title);
                         }
-                        else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold()*10) == 0) {
+                        else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold()*getReportingFrequencyMultiplier()) == 0) {
                             reportFailure(urlObject, title);
                         }
                         
