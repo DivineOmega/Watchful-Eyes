@@ -35,7 +35,13 @@
             {
                 text = text.replace(/<br\/>/g, '\n');
                 text = text.replace(/<hr\/>/g, '');
-                text = '<!channel>\n' + text;
+                
+                if (urlObject.slackNotifyEveryone) {
+                    text = '<!everyone>\n' + text;
+                }
+                else {
+                    text = '<!channel>\n' + text;
+                }
                 
                 var payload = {};
                 payload.text = text;
