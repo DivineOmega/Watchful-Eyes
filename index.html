@@ -31,6 +31,41 @@
             
             require('./jquery-ui-1.11.4.custom/jquery-ui.js');
             
+            function reportToSlackWebHookUrl(urlObject, text)
+            {
+                text = text.replace(/<br\/>/g, '\n');
+                text = text.replace(/<hr\/>/g, '');
+                text = '<!channel>\n' + text;
+                
+                var payload = {};
+                payload.text = text;
+                payload.username = urlObject.siteName + ' status checker';
+                payload.icon_emoji = ':warning:';
+                
+                var jsonPayload = JSON.stringify(payload);
+                
+                $.ajax
+                ({
+                    type: "POST",
+                    url: urlObject.slackWebHookUrl,
+                    dataType: 'json',
+                    data: jsonPayload
+                });
+                
+            }
+            
+            function reportFailure(urlObject, text)
+            {
+                if (typeof urlObject.slackWebHookUrl != 'undefined') {
+                    reportToSlackWebHookUrl(urlObject, text);
+                }
+            }
+            
+            function getFailureCountThreshold()
+            {
+                return 3;
+            }
+            
             function getErrorText(status, statusText)
             {
                 var errorText = status;
@@ -90,8 +125,15 @@
                     
                     var colour = '#c00';
                     
-                    if (urlObject.failures<5) {
+                    if (urlObject.failures < getFailureCountThreshold()) {
                         colour = '#FFA500'
+                    }
+                    
+                    if (urlObject.failures == getFailureCountThreshold()) {
+                        reportFailure(urlObject, title);
+                    }
+                    else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold()*10) == 0) {
+                        reportFailure(urlObject, title);
                     }
                     
                     $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
@@ -139,8 +181,15 @@
                         
                         var colour = '#c00';
                         
-                        if (urlObject.failures<5) {
+                        if (urlObject.failures < getFailureCountThreshold) {
                             colour = '#FFA500'
+                        }
+                        
+                        if (urlObject.failures == getFailureCountThreshold()) {
+                            reportFailure(urlObject, title);
+                        }
+                        else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold()*10) == 0) {
+                            reportFailure(urlObject, title);
                         }
                         
                         $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
