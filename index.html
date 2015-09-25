@@ -7,15 +7,15 @@
             body {
                 margin: 0px;
                 background-color: #333;
-                font-size: 14px;
+                font-size: 12px;
             }
             
             .urlObjectLight {
                 float: left;
                 width: 20px;
                 height: 20px;
-                background-color: #ccc;
-                margin: 1px;
+                background-color: #CCC;
+                border: 1px #333 solid;
             }
         </style>
     </head>
@@ -48,7 +48,7 @@
             
             function getRequestDelay()
             {
-                var requestDelaySeconds = 5 + Math.floor(Math.random()*5);
+                var requestDelaySeconds = 15 + Math.floor(Math.random()*15);
                 
                 return requestDelaySeconds * 1000;
             }
@@ -71,6 +71,8 @@
                 if (typeof urlObject.startedDate == 'undefined') {
                     urlObject.startedDate = null;
                 }
+                
+                $('#urlObject'+index+'.urlObjectLight').css('border-color', '#CCC');
                 
                 $.ajax({ 
                     url: urlObject.url, 
@@ -97,15 +99,70 @@
                     
                 }).done(function(data){
                     
-                    urlObject.failures = 0;
-                    urlObject.startedDate = null;
+                    var inpageErrors = [];
                     
-                    var title = titlePrefix + 'No problems detected.';
+                    var minPageSize = 1024 * 1;
                     
-                    $('#urlObject'+index+'.urlObjectLight').css('background-color', '#0c0');
-                    $('#urlObject'+index+'.urlObjectLight').attr('title', title);
+                    if (data.indexOf('Deprecated: ') > -1 && data.indexOf(' on line ') > -1) {
+                        inpageErrors.push('PHP Deprecated');
+                    }
+                    
+                    if (data.indexOf('Notice: ') > -1 && data.indexOf(' on line ') > -1) {
+                        inpageErrors.push('PHP Notice');
+                    }
+                    
+                    if (data.indexOf('Warning: ') > -1 && data.indexOf(' on line ') > -1) {
+                        inpageErrors.push('PHP Warning');
+                    }
+                    
+                    if (data.indexOf('Fatal Error: ') > -1 && data.indexOf(' on line ') > -1) {
+                        inpageErrors.push('PHP Fatal Error');
+                    }
+                    
+                    if (data.length<minPageSize) {
+                        inpageErrors.push('Page size is below '+minPageSize+' bytes.');
+                    }
+                    
+                    if (inpageErrors.length>0) {
+                        
+                        urlObject.failures++;
+                        if (urlObject.startedDate===null) urlObject.startedDate = Date();
+                        
+                        var title = titlePrefix;
+                        
+                        for (var i = 0; i < inpageErrors.length; i++) {
+                            title += 'Problem '+(i+1)+': '+ inpageErrors[i] + '<br/>';
+                        }
+                        
+                        title += 'Ocurrences: ' + urlObject.failures + '<br/>';
+                        title += 'Started: ' + urlObject.startedDate + '<br/>';
+                        
+                        var colour = '#c00';
+                        
+                        if (urlObject.failures<5) {
+                            colour = '#FFA500'
+                        }
+                        
+                        $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
+                        $('#urlObject'+index+'.urlObjectLight').attr('title', title);
+                        
+                    }
+                    else {
+                    
+                        urlObject.failures = 0;
+                        urlObject.startedDate = null;
+                        
+                        var title = titlePrefix + 'No problems detected.';
+                        
+                        $('#urlObject'+index+'.urlObjectLight').css('background-color', '#0c0');
+                        $('#urlObject'+index+'.urlObjectLight').attr('title', title);
+                        
+                    }
+                    
                 }).always(function()
                 {
+                    $('#urlObject'+index+'.urlObjectLight').css('border-color', '#333');
+                    
                     setTimeout(function() { checkUrlObject(index, urlObject); }, getRequestDelay());
                 });
             }
