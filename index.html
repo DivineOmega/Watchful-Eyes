@@ -33,20 +33,22 @@
             
             function reportToSlackWebHookUrl(urlObject, text)
             {
+                var payload = {};
+                payload.username = urlObject.siteName + ' status checker';
+                payload.icon_emoji = ':warning:';
+                
                 text = text.replace(/<br\/>/g, '\n');
                 text = text.replace(/<hr\/>/g, '');
                 
-                if (urlObject.slackNotifyEveryone) {
+                if (typeof urlObject.slackNotifyEveryone != undefined && urlObject.slackNotifyEveryone == true) {
                     text = '<!everyone>\n' + text;
+                    payload.channel = "#general";
                 }
                 else {
                     text = '<!channel>\n' + text;
                 }
                 
-                var payload = {};
                 payload.text = text;
-                payload.username = urlObject.siteName + ' status checker';
-                payload.icon_emoji = ':warning:';
                 
                 var jsonPayload = JSON.stringify(payload);
                 
