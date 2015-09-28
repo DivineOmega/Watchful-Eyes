@@ -21,6 +21,10 @@
                 background-color: #CCC;
                 border: 1px #333 solid;
             }
+            
+            .ui-tooltip {
+                max-width: 1000px !important;   
+            }
         </style>
     </head>
     
@@ -198,7 +202,7 @@
                         
                         var colour = '#c00';
                         
-                        if (urlObject.failures < getFailureCountThreshold) {
+                        if (urlObject.failures < getFailureCountThreshold()) {
                             colour = '#FFA500'
                         }
                         
