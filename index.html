@@ -131,8 +131,7 @@
                 $('#urlObject'+index+'.urlObjectLight').css('border-color', '#CCC');
                 
                 $.ajax({ 
-                    url: urlObject.url, 
-                    cache: false,
+                    url: urlObject.url,
                     timeout: 3000
                 }).fail(function(jqXHR, textStatus, errorThrown)
                 {
