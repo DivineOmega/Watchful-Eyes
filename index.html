@@ -165,19 +165,19 @@
                     
                     var minPageSize = 1024 * 1;
                     
-                    if (data.indexOf('Deprecated: ') > -1 && data.indexOf(' on line ') > -1) {
+                    if (data.indexOf('Deprecated') > -1 && data.indexOf(' on line ') > -1) {
                         inpageErrors.push('PHP Deprecated');
                     }
                     
-                    if (data.indexOf('Notice: ') > -1 && data.indexOf(' on line ') > -1) {
+                    if (data.indexOf('Notice') > -1 && data.indexOf(' on line ') > -1) {
                         inpageErrors.push('PHP Notice');
                     }
                     
-                    if (data.indexOf('Warning: ') > -1 && data.indexOf(' on line ') > -1) {
+                    if (data.indexOf('Warning') > -1 && data.indexOf(' on line ') > -1) {
                         inpageErrors.push('PHP Warning');
                     }
                     
-                    if (data.indexOf('Fatal Error: ') > -1 && data.indexOf(' on line ') > -1) {
+                    if (data.indexOf('Fatal error') > -1 && data.indexOf(' on line ') > -1) {
                         inpageErrors.push('PHP Fatal Error');
                     }
                     
