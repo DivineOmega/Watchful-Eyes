@@ -244,6 +244,21 @@
                 });
             }
             
+            var urlObjectsCount = 0;
+            
+            function checkIfUrlsConfigChanged() 
+            {
+                $.getJSON( "config/urls.json", function( urlObjects ) {
+                    
+                    if (urlObjectsCount != urlObjects.length) {
+                        location.reload();
+                    }
+                    
+                    setTimeout(function() { checkIfUrlsConfigChanged(); }, 5000 );
+                    
+                });
+            }
+            
             $(document).ready(function(){
                 
                 $( document ).tooltip({ 
@@ -254,6 +269,8 @@
                 
                 $.getJSON( "config/urls.json", function( urlObjects ) {
                     
+                    urlObjectsCount = urlObjects.length;
+                    
                     for (var i = 0; i < urlObjects.length; i++) {
                         
                         var urlObject = urlObjects[i];
@@ -263,6 +280,8 @@
                     }
                     
                 });
+                
+                checkIfUrlsConfigChanged();
             });
             
         </script>
