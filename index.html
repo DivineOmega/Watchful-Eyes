@@ -248,15 +248,15 @@
             
             function checkIfUrlsConfigChanged() 
             {
-                $.getJSON( "config/urls.json", function( urlObjects ) {
-                    
-                    if (urlObjectsCount != urlObjects.length) {
-                        location.reload();
-                    }
-                    
-                    setTimeout(function() { checkIfUrlsConfigChanged(); }, 5000 );
-                    
-                });
+                $.getJSON( "config/urls.json")
+                    .done(function(urlObjects){
+	                    if (urlObjectsCount != urlObjects.length) {
+        	                location.reload();
+                	    }
+			})
+                    .always(function(){
+	                    setTimeout(function() { checkIfUrlsConfigChanged(); }, 5000 );
+        	    });
             }
             
             $(document).ready(function(){
@@ -267,7 +267,8 @@
                     } 
                 });
                 
-                $.getJSON( "config/urls.json", function( urlObjects ) {
+                $.getJSON( "config/urls.json")
+		   .done(function(urlObjects){
                     
                     urlObjectsCount = urlObjects.length;
                     
