@@ -34,6 +34,8 @@
         </div>
         
         <script>
+			
+			var urlObjects = [];
             
             var remote = require('remote');
             var Menu = remote.require('menu');
@@ -112,7 +114,14 @@
             
             function getRequestDelay()
             {
-                var requestDelaySeconds = 15 + Math.floor(Math.random()*15);
+                var requestDelaySeconds = 30 + Math.floor(Math.random()*30);
+                
+                return requestDelaySeconds * 1000;
+            }
+            
+            function getInitialRequestDelay(index)
+            {
+                var requestDelaySeconds = 1 + (index * 0.5);
                 
                 return requestDelaySeconds * 1000;
             }
@@ -240,17 +249,35 @@
                 {
                     $('#urlObject'+index+'.urlObjectLight').css('border-color', '#333');
                     
-                    setTimeout(function() { checkUrlObject(index, urlObject); }, getRequestDelay());
+                    doSetTimeout(index, urlObject, false);
                 });
             }
             
-            var urlObjectsCount = 0;
+            function doSetTimeout(index, urlObject, initial) {
+				
+				var delay = null;
+				
+				if (initial) {
+					delay = getInitialRequestDelay(index);
+				} else {
+					delay = getRequestDelay();
+				}
+				
+				setTimeout(function() { checkUrlObject(index, urlObject); }, delay);
+			}
             
+            function beginChecks() 
+            {
+				for (var i = 0; i < urlObjects.length; ++i) {
+					doSetTimeout(i, urlObjects[i], true);
+				}
+			}
+                        
             function checkIfUrlsConfigChanged() 
             {
-                $.getJSON( "config/urls.json", function( urlObjects ) {
+                $.getJSON( "config/urls.json", function( response ) {
                     
-                    if (urlObjectsCount != urlObjects.length) {
+                    if (urlObjects.length != response.length) {
                         location.reload();
                     }
                     
@@ -267,21 +294,17 @@
                     } 
                 });
                 
-                $.getJSON( "config/urls.json", function( urlObjects ) {
-                    
-                    urlObjectsCount = urlObjects.length;
-                    
-                    for (var i = 0; i < urlObjects.length; i++) {
+                $.getJSON( "config/urls.json", function( response ) {
+                                        
+                    for (var i = 0; i < response.length; i++) {
                         
-                        var urlObject = urlObjects[i];
-                        
-                        checkUrlObject(i, urlObject);
-                        
+                        urlObjects.push(response[i]);                        
                     }
                     
+                    beginChecks();
+                    
+                    checkIfUrlsConfigChanged();
                 });
-                
-                checkIfUrlsConfigChanged();
             });
             
         </script>
