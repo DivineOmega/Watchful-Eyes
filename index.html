@@ -13,13 +13,25 @@
             #urlObjects {
                 margin: 20px;
             }
+
+            .urlObjectParent {
+                background: #FEFEFE;
+                width: 128px;
+                height: 128px;
+                position: relative;
+                float: left;
+                margin-right: 5px;
+                margin-bottom: 5px;
+            }
             
             .urlObjectLight {
-                float: left;
                 width: 40px;
                 height: 40px;
                 background-color: #CCC;
                 border: 1px #333 solid;
+                position: absolute;
+                bottom: 5px;
+                right: 5px;
             }
             
             .ui-tooltip {
@@ -125,6 +137,19 @@
                 
                 return requestDelaySeconds * 1000;
             }
+
+            function stripHttp(url) {
+
+                if(url.indexOf('http://') >= 0) {
+                    url = url.replace('http://','');
+                } else if(url.indexOf('https://') >= 0) {
+                    url = url.replace('https://','');
+                }
+
+                url = url.replace('/', '');
+
+                return url;
+            };
             
             function checkUrlObject(index, urlObject)
             {
@@ -134,7 +159,8 @@
                 titlePrefix += 'URL: ' + urlObject.url + '<br/><hr/>';
                 
                 if (!$('#urlObject'+index).length) {
-                    $('#urlObjects').append('<div class="urlObjectLight" id="urlObject'+index+'" title="'+titlePrefix+'Not yet checked">');
+                    var imgUrl = stripHttp(urlObject.url);
+                    $('#urlObjects').append('<div class="urlObjectParent"><img src="https://logo.clearbit.com/'+imgUrl+'"><div class="urlObjectLight" id="urlObject'+index+'" title="'+titlePrefix+'Not yet checked"></div>');
                 }
                 
                 if (typeof urlObject.failures == 'undefined') {
