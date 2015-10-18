@@ -6,29 +6,32 @@
         <style>
             body {
                 margin: 0px;
-                background-color: #333;
+                background-color: #222;
                 font-size: 20px;
             }
             
             #urlObjects {
-                margin: 20px;
+                margin: 16px;
+                text-align: center;
+
             }
 
             .urlObjectParent {
-                background: #FEFEFE;
+                background: #ecf0f1;
                 width: 128px;
                 height: 128px;
                 position: relative;
                 float: left;
                 margin-right: 5px;
                 margin-bottom: 5px;
+                text-align: center;
             }
             
             .urlObjectLight {
-                width: 40px;
-                height: 40px;
+                width: 32px;
+                height: 32px;
                 background-color: #CCC;
-                border: 1px #333 solid;
+                border-radius: 50%;
                 position: absolute;
                 bottom: 5px;
                 right: 5px;
@@ -171,7 +174,7 @@
                     urlObject.startedDate = null;
                 }
                 
-                $('#urlObject'+index+'.urlObjectLight').css('border-color', '#CCC');
+                $('#urlObject'+index+'.urlObjectLight').css('border', '1px solid #bdc3c7');
                 
                 $.ajax({ 
                     url: urlObject.url,
@@ -186,10 +189,12 @@
                     title += 'Ocurrences: ' + urlObject.failures + '<br/>';
                     title += 'Started: ' + urlObject.startedDate + '<br/>';
                     
-                    var colour = '#c00';
-                    
+                    var colour = '#e74c3c',
+                    borderColour = '#c0392b';
+
                     if (urlObject.failures < getFailureCountThreshold()) {
-                        colour = '#FFA500'
+                        colour = '#e67e22'
+                        borderColour = '#d35400';
                     }
                     
                     if (urlObject.failures == getFailureCountThreshold()) {
@@ -200,6 +205,7 @@
                     }
                     
                     $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
+                    $('#urlObject'+index+'.urlObjectLight').css('border', '1px solid '+ borderColour + '');
                     $('#urlObject'+index+'.urlObjectLight').attr('title', title);
                     
                 }).done(function(data){
@@ -242,10 +248,10 @@
                         title += 'Ocurrences: ' + urlObject.failures + '<br/>';
                         title += 'Started: ' + urlObject.startedDate + '<br/>';
                         
-                        var colour = '#c00';
+                        var colour = '#c0392b';
                         
                         if (urlObject.failures < getFailureCountThreshold()) {
-                            colour = '#FFA500'
+                            colour = '#f39c12'
                         }
                         
                         if (urlObject.failures == getFailureCountThreshold()) {
@@ -256,6 +262,7 @@
                         }
                         
                         $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
+                        $('#urlObject'+index+'.urlObjectLight').css('border', '1px solid '+ borderColour +'');
                         $('#urlObject'+index+'.urlObjectLight').attr('title', title);
                         
                     }
@@ -266,15 +273,14 @@
                         
                         var title = titlePrefix + 'No problems detected.';
                         
-                        $('#urlObject'+index+'.urlObjectLight').css('background-color', '#0c0');
+                        $('#urlObject'+index+'.urlObjectLight').css('background-color', '#2ecc71');
+                        $('#urlObject'+index+'.urlObjectLight').css('border', '1px solid #27ae60');
                         $('#urlObject'+index+'.urlObjectLight').attr('title', title);
                         
                     }
                     
                 }).always(function()
                 {
-                    $('#urlObject'+index+'.urlObjectLight').css('border-color', '#333');
-                    
                     doSetTimeout(index, urlObject, false);
                 });
             }
