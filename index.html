@@ -4,6 +4,31 @@
         <title>Watchful Eyes</title>
         <link href="./jquery-ui-1.11.4.custom/jquery-ui.css" rel="stylesheet">
         <style>
+
+            @-webkit-keyframes scaleIn {
+                from {
+                    -webkit-transform: scale(1,1); /* Safari */
+                    transform: scale(1,1);
+                }
+                to {
+                    -webkit-transform: scale(1.1,1.1); /* Safari */
+                    transform: scale(1.1,1.1);
+                }
+            } 
+
+            /* Standard syntax */ 
+            @keyframes mymove {
+                from {
+                    -webkit-transform: scale(1,1); /* Safari */
+                    transform: scale(1,1);
+                }
+                to {
+                    -webkit-transform: scale(1.1,1.1); /* Safari */
+                    transform: scale(1.1,1.1);
+                }
+            }
+
+
             body {
                 margin: 0px;
                 background-color: #222;
@@ -16,6 +41,15 @@
 
             }
 
+            .scaleIn {
+                animation-name: scaleIn;
+                animation-duration: 0.25s;
+                animation-fill-mode: forwards;
+                -webkit-animation-name: scaleIn;
+                -webkit-animation-duration: 0.25s;
+                -webkit-animation-fill-mode: forwards;
+            }
+
             .urlObjectParent {
                 background: #ecf0f1;
                 width: 128px;
@@ -25,6 +59,17 @@
                 margin-right: 5px;
                 margin-bottom: 5px;
                 text-align: center;
+            }
+
+            .urlObjectParent:hover {
+                cursor: pointer;
+                z-index: 111;
+                animation-name: scaleIn;
+                animation-duration: 0.25s;
+                animation-fill-mode: forwards;
+                -webkit-animation-name: scaleIn;
+                -webkit-animation-duration: 0.25s;
+                -webkit-animation-fill-mode: forwards;
             }
             
             .urlObjectLight {
@@ -171,6 +216,7 @@
                 }
                 
                 $('#urlObject'+index+'.urlObjectLight').css('border', '1px solid #bdc3c7');
+                $('#urlObject'+index+'.urlObjectLight').parent().addClass('scaleIn');
                 
                 $.ajax({ 
                     url: urlObject.url,
@@ -277,7 +323,10 @@
                     
                 }).always(function()
                 {
+                    $('#urlObject'+index+'.urlObjectLight').parent().removeClass('scaleIn');
+                    $('#urlObject'+index+'.urlObjectLight').parent().addClass('scaleOut');
                     doSetTimeout(index, urlObject, false);
+
                 });
             }
             
