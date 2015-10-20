@@ -141,16 +141,12 @@
                 return requestDelaySeconds * 1000;
             }
 
-            function stripHttp(url) {
-
-                if(url.indexOf('http://') >= 0) {
-                    url = url.replace('http://','');
-                } else if(url.indexOf('https://') >= 0) {
-                    url = url.replace('https://','');
+            function stripUrl(url) {
+                url = url.split('/'); 
+                url = url[2];
+                if(url.indexOf('www.') == -1) {    
+                    url = 'www.'+url;
                 }
-
-                url = url.replace('/', '');
-
                 return url;
             };
             
@@ -162,7 +158,7 @@
                 titlePrefix += 'URL: ' + urlObject.url + '<br/><hr/>';
                 
                 if (!$('#urlObject'+index).length) {
-                    var imgUrl = stripHttp(urlObject.url);
+                    var imgUrl = stripUrl(urlObject.url);
                     $('#urlObjects').append('<div class="urlObjectParent"><img src="https://logo.clearbit.com/'+imgUrl+'"><div class="urlObjectLight" id="urlObject'+index+'" title="'+titlePrefix+'Not yet checked"></div>');
                 }
                 
