@@ -75,7 +75,8 @@
                     type: "POST",
                     url: urlObject.slackWebHookUrl,
                     dataType: 'json',
-                    data: jsonPayload
+                    data: jsonPayload,
+                    timeout: 3000
                 });
                 
             }
@@ -114,7 +115,7 @@
             
             function getRequestDelay()
             {
-                var requestDelaySeconds = 60 + Math.floor(Math.random()*60);
+                var requestDelaySeconds = 120 + Math.floor(Math.random()*120);
                 
                 return requestDelaySeconds * 1000;
             }
