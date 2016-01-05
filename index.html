@@ -35,6 +35,7 @@
 
         <script>
 
+      var urlObjectsJSON = null;
 			var urlObjects = [];
 
             var remote = require('remote');
@@ -286,15 +287,15 @@
 
             function checkIfUrlsConfigChanged()
             {
-                $.getJSON( "config/urls.json", function( response ) {
+                $.get( "config/urls.json", function( response ) {
 
-                    if (urlObjects.length != response.length) {
+                    if (urlObjectsJSON != response) {
                         location.reload();
                     }
 
                     setTimeout(function() { checkIfUrlsConfigChanged(); }, 5000 );
 
-                });
+                }, "text");
             }
 
             $(document).ready(function(){
@@ -305,17 +306,16 @@
                     }
                 });
 
-                $.getJSON( "config/urls.json", function( response ) {
+                $.get( "config/urls.json", function( response ) {
 
-                    for (var i = 0; i < response.length; i++) {
-
-                        urlObjects.push(response[i]);
-                    }
+                    urlObjectsJSON = response;
+                    
+                    urlObjects = JSON.parse(urlObjectsJSON);
 
                     beginChecks();
 
                     checkIfUrlsConfigChanged();
-                });
+                }, "text");
             });
 
         </script>
