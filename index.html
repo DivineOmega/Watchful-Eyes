@@ -9,11 +9,11 @@
                 background-color: #333;
                 font-size: 20px;
             }
-            
+
             #urlObjects {
                 margin: 20px;
             }
-            
+
             .urlObjectLight {
                 float: left;
                 width: 40px;
@@ -21,43 +21,43 @@
                 background-color: #CCC;
                 border: 1px #333 solid;
             }
-            
+
             .ui-tooltip {
-                max-width: 1000px !important;   
+                max-width: 1000px !important;
             }
         </style>
     </head>
-    
+
     <body>
-        
+
         <div id="urlObjects">
         </div>
-        
+
         <script>
-			
+
 			var urlObjects = [];
-            
+
             var remote = require('remote');
             var Menu = remote.require('menu');
             var MenuItem = remote.require('menu-item');
-            
+
             var appMenu = new Menu();
-            
+
             Menu.setApplicationMenu(null);
-        
+
             window.$ = window.jQuery = require('./jquery-2.1.4.min.js');
-            
+
             require('./jquery-ui-1.11.4.custom/jquery-ui.js');
-            
+
             function reportToSlackWebHookUrl(urlObject, text)
             {
                 var payload = {};
                 payload.username = urlObject.siteName + ' status checker';
                 payload.icon_emoji = ':warning:';
-                
+
                 text = text.replace(/<br\/>/g, '\n');
                 text = text.replace(/<hr\/>/g, '');
-                
+
                 if (typeof urlObject.slackNotifyEveryone != undefined && urlObject.slackNotifyEveryone == true) {
                     text = '<!everyone>\n' + text;
                     payload.channel = "#general";
@@ -65,11 +65,11 @@
                 else {
                     text = '<!channel>\n' + text;
                 }
-                
+
                 payload.text = text;
-                
+
                 var jsonPayload = JSON.stringify(payload);
-                
+
                 $.ajax
                 ({
                     type: "POST",
@@ -78,238 +78,248 @@
                     data: jsonPayload,
                     timeout: 3000
                 });
-                
+
             }
-            
+
             function reportFailure(urlObject, text)
             {
                 if (typeof urlObject.slackWebHookUrl != 'undefined') {
                     reportToSlackWebHookUrl(urlObject, text);
                 }
             }
-            
+
             function getFailureCountThreshold()
             {
                 return 3;
             }
-            
+
             function getReportingFrequencyMultiplier()
             {
                 return 10;
             }
-            
+
             function getErrorText(status, statusText)
             {
                 var errorText = status;
-                
+
                 switch (status)
                 {
                     case 0: errorText = 'Connection error'; break;
-                        
+
                 }
-                
+
                 errorText += ' (' + statusText + ')'
-                
+
                 return errorText;
             }
-            
+
             function getRequestDelay()
             {
                 var requestDelaySeconds = 240 + Math.floor(Math.random()*240);
-                
+
                 return requestDelaySeconds * 1000;
             }
-            
+
             function getInitialRequestDelay(index)
             {
                 var requestDelaySeconds = 1 + (index * 0.5);
-                
+
                 return requestDelaySeconds * 1000;
             }
-            
+
             function checkUrlObject(index, urlObject)
             {
                 var titlePrefix = '';
                 titlePrefix += 'Site name: ' + urlObject.siteName + '<br/>'
-                titlePrefix += 'Page name: ' + urlObject.pageName + '<br/>' 
+                titlePrefix += 'Page name: ' + urlObject.pageName + '<br/>'
                 titlePrefix += 'URL: ' + urlObject.url + '<br/><hr/>';
-                
+
                 if (!$('#urlObject'+index).length) {
                     $('#urlObjects').append('<div class="urlObjectLight" id="urlObject'+index+'" title="'+titlePrefix+'Not yet checked">');
                 }
-                
+
                 if (typeof urlObject.failures == 'undefined') {
                     urlObject.failures = 0;
                 }
-                
+
                 if (typeof urlObject.startedDate == 'undefined') {
                     urlObject.startedDate = null;
                 }
-                
+
+                if (typeof urlObject.timeout == 'undefined') {
+                    urlObject.timeout = 3000;
+                }
+
                 $('#urlObject'+index+'.urlObjectLight').css('border-color', '#CCC');
-                
-                $.ajax({ 
+
+                $.ajax({
                     url: urlObject.url,
-                    timeout: 3000
+                    timeout: urlObject.timeout
                 }).fail(function(jqXHR, textStatus, errorThrown)
                 {
                     urlObject.failures++;
                     if (urlObject.startedDate===null) urlObject.startedDate = Date();
-                    
+
                     var title = titlePrefix;
                     title += 'Problem: '+ getErrorText(jqXHR.status, jqXHR.statusText) + '<br/>';
+
+                    if (jqXHR.statusText=='timeout')
+                    {
+                      title += 'Timeout setting: ' + (urlObject.timeout/1000) + ' seconds<br/>';
+                    }
+
                     title += 'Ocurrences: ' + urlObject.failures + '<br/>';
                     title += 'Started: ' + urlObject.startedDate + '<br/>';
-                    
+
                     var colour = '#c00';
-                    
+
                     if (urlObject.failures < getFailureCountThreshold()) {
                         colour = '#FFA500'
                     }
-                    
+
                     if (urlObject.failures == getFailureCountThreshold()) {
                         reportFailure(urlObject, title);
                     }
                     else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold()*getReportingFrequencyMultiplier()) == 0) {
                         reportFailure(urlObject, title);
                     }
-                    
+
                     $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
                     $('#urlObject'+index+'.urlObjectLight').attr('title', title);
-                    
+
                 }).done(function(data){
-                    
+
                     var inpageErrors = [];
-                    
+
                     var minPageSize = 1024 * 1;
-                    
+
                     if (data.indexOf('Deprecated') > -1 && data.indexOf(' on line ') > -1) {
                         inpageErrors.push('PHP Deprecated');
                     }
-                    
+
                     if (data.indexOf('Notice') > -1 && data.indexOf(' on line ') > -1) {
                         inpageErrors.push('PHP Notice');
                     }
-                    
+
                     if (data.indexOf('Warning') > -1 && data.indexOf(' on line ') > -1) {
                         inpageErrors.push('PHP Warning');
                     }
-                    
+
                     if (data.indexOf('Fatal error') > -1 && data.indexOf(' on line ') > -1) {
                         inpageErrors.push('PHP Fatal Error');
                     }
-                    
+
                     if (data.length<minPageSize) {
                         inpageErrors.push('Page size is below '+minPageSize+' bytes.');
                     }
-                    
+
                     if (inpageErrors.length>0) {
-                        
+
                         urlObject.failures++;
                         if (urlObject.startedDate===null) urlObject.startedDate = Date();
-                        
+
                         var title = titlePrefix;
-                        
+
                         for (var i = 0; i < inpageErrors.length; i++) {
                             title += 'Problem '+(i+1)+': '+ inpageErrors[i] + '<br/>';
                         }
-                        
+
                         title += 'Ocurrences: ' + urlObject.failures + '<br/>';
                         title += 'Started: ' + urlObject.startedDate + '<br/>';
-                        
+
                         var colour = '#c00';
-                        
+
                         if (urlObject.failures < getFailureCountThreshold()) {
                             colour = '#FFA500'
                         }
-                        
+
                         if (urlObject.failures == getFailureCountThreshold()) {
                             reportFailure(urlObject, title);
                         }
                         else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold()*getReportingFrequencyMultiplier()) == 0) {
                             reportFailure(urlObject, title);
                         }
-                        
+
                         $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
                         $('#urlObject'+index+'.urlObjectLight').attr('title', title);
-                        
+
                     }
                     else {
-                    
+
                         urlObject.failures = 0;
                         urlObject.startedDate = null;
-                        
+
                         var title = titlePrefix + 'No problems detected.';
-                        
+
                         $('#urlObject'+index+'.urlObjectLight').css('background-color', '#0c0');
                         $('#urlObject'+index+'.urlObjectLight').attr('title', title);
-                        
+
                     }
-                    
+
                 }).always(function()
                 {
                     $('#urlObject'+index+'.urlObjectLight').css('border-color', '#333');
-                    
+
                     doSetTimeout(index, urlObject, false);
                 });
             }
-            
+
             function doSetTimeout(index, urlObject, initial) {
-				
+
 				var delay = null;
-				
+
 				if (initial) {
 					delay = getInitialRequestDelay(index);
 				} else {
 					delay = getRequestDelay();
 				}
-				
+
 				setTimeout(function() { checkUrlObject(index, urlObject); }, delay);
 			}
-            
-            function beginChecks() 
+
+            function beginChecks()
             {
 				for (var i = 0; i < urlObjects.length; ++i) {
 					doSetTimeout(i, urlObjects[i], true);
 				}
 			}
-                        
-            function checkIfUrlsConfigChanged() 
+
+            function checkIfUrlsConfigChanged()
             {
                 $.getJSON( "config/urls.json", function( response ) {
-                    
+
                     if (urlObjects.length != response.length) {
                         location.reload();
                     }
-                    
+
                     setTimeout(function() { checkIfUrlsConfigChanged(); }, 5000 );
-                    
+
                 });
             }
-            
+
             $(document).ready(function(){
-                
-                $( document ).tooltip({ 
+
+                $( document ).tooltip({
                     content: function () {
                         return $(this).prop('title');
-                    } 
-                });
-                
-                $.getJSON( "config/urls.json", function( response ) {
-                                        
-                    for (var i = 0; i < response.length; i++) {
-                        
-                        urlObjects.push(response[i]);                        
                     }
-                    
+                });
+
+                $.getJSON( "config/urls.json", function( response ) {
+
+                    for (var i = 0; i < response.length; i++) {
+
+                        urlObjects.push(response[i]);
+                    }
+
                     beginChecks();
-                    
+
                     checkIfUrlsConfigChanged();
                 });
             });
-            
+
         </script>
-        
+
     </body>
 
-</html> 
+</html>
