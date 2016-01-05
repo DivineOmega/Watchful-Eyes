@@ -309,9 +309,17 @@
                 $.get( "config/urls.json", function( response ) {
 
                     urlObjectsJSON = response;
-                    
-                    urlObjects = JSON.parse(urlObjectsJSON);
 
+                    try
+                    {
+                      urlObjects = JSON.parse(urlObjectsJSON);
+                    }
+                    catch (e)
+                    {
+                      alert('Your `urls.json` file could not be parsed. \nPlease check its syntax. \n\nDetails: '+e.message);
+                      location.reload();
+                      return;
+                    }
                     beginChecks();
 
                     checkIfUrlsConfigChanged();
