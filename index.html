@@ -77,7 +77,8 @@
                     url: urlObject.slackWebHookUrl,
                     dataType: 'json',
                     data: jsonPayload,
-                    timeout: 3000
+                    timeout: 3000,
+                    contentType: "application/json; charset=utf-8"
                 });
 
             }
