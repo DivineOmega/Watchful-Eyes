@@ -221,10 +221,25 @@
                 if (typeof urlObject.startedDate == 'undefined') {
                     urlObject.startedDate = null;
                 }
+
+                if (typeof urlObject.testError == 'undefined') {
+                    urlObject.testError = false;
+                }
+
+                if (urlObject.testError == true) {
+                    urlObject.failures = getFailureCountThreshold();
+                    if (urlObject.startedDate===null) urlObject.startedDate = Date();
+                    var colour = '#e74c3c',
+                    borderColour = '#c0392b';
+                    $('#urlObject'+index+' > .urlObjectLight').css('background-color', colour);
+                    $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour + '');
+                    $('#urlObject'+index).attr('title', "Test error!");
+                    return;
+                }
                 
                 $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid #bdc3c7');
                 $('#urlObject'+index+' > .urlObjectLight').parent().addClass('scaleIn');
-                
+
                 $.ajax({ 
                     url: urlObject.url,
                     timeout: urlObject.timeout
@@ -303,10 +318,12 @@
                         title += 'Ocurrences: ' + urlObject.failures + '<br/>';
                         title += 'Started: ' + urlObject.startedDate + '<br/>';
 
-                        var colour = '#c0392b';
+                        var colour = '#c0392b',
+                        borderColour = '#c0392b';
 
                         if (urlObject.failures < getFailureCountThreshold()) {
                             colour = '#f39c12'
+                            borderColour = '#d35400';
                         }
 
                         if (urlObject.failures == getFailureCountThreshold()) {
