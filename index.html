@@ -222,9 +222,11 @@
                 titlePrefix += 'Page name: ' + urlObject.pageName + '<br/>'
                 titlePrefix += 'URL: ' + urlObject.url + '<br/><hr/>';
 
+                var placeholderImageUrl = 'https://placeholdit.imgix.net/~text?txtsize=36&txt='+encodeURIComponent(urlObject.siteName)+'&w=128&h=128&txttrack=0';
+
                 if (!$('#urlObject'+index).length) {
                     var imgUrl = stripUrl(urlObject.url);
-                    $('#urlObjects').append('<div class="urlObjectParent" id="urlObject'+index+'" title="'+titlePrefix+' Not yet checked"><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\'https://upload.wikimedia.org/wikipedia/commons/c/ce/Example_image.png\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
+                    $('#urlObjects').append('<div class="urlObjectParent" id="urlObject'+index+'" title="'+titlePrefix+' Not yet checked"><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
                 }
 
                 if (typeof urlObject.failures == 'undefined') {
