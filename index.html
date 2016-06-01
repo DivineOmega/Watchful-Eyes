@@ -61,6 +61,11 @@
                 text-align: center;
             }
 
+            .urlObjectParent img {
+                width: 128px;
+                height: 128px;
+            }
+
             .urlObjectParent:hover {
                 cursor: pointer;
                 z-index: 111;
@@ -206,7 +211,7 @@
 
                 if (!$('#urlObject'+index).length) {
                     var imgUrl = stripUrl(urlObject.url);
-                    $('#urlObjects').append('<div class="urlObjectParent"><img src="https://logo.clearbit.com/'+imgUrl+'"><div class="urlObjectLight" id="urlObject'+index+'" title="'+titlePrefix+'Not yet checked"></div>');
+                    $('#urlObjects').append('<div class="urlObjectParent" id="urlObject'+index+'" title="'+titlePrefix+' Not yet checked"><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\'https://upload.wikimedia.org/wikipedia/commons/c/ce/Example_image.png\'"><div class="urlObjectLight"  ></div>');
                 }
 
                 if (typeof urlObject.failures == 'undefined') {
@@ -217,8 +222,8 @@
                     urlObject.startedDate = null;
                 }
                 
-                $('#urlObject'+index+'.urlObjectLight').css('border', '1px solid #bdc3c7');
-                $('#urlObject'+index+'.urlObjectLight').parent().addClass('scaleIn');
+                $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid #bdc3c7');
+                $('#urlObject'+index+' > .urlObjectLight').parent().addClass('scaleIn');
                 
                 $.ajax({ 
                     url: urlObject.url,
@@ -254,9 +259,9 @@
                         reportFailure(urlObject, title);
                     }
 
-                    $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
-                    $('#urlObject'+index+'.urlObjectLight').css('border', '1px solid '+ borderColour + '');
-                    $('#urlObject'+index+'.urlObjectLight').attr('title', title);
+                    $('#urlObject'+index+' > .urlObjectLight').css('background-color', colour);
+                    $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour + '');
+                    $('#urlObject'+index).attr('title', title);
 
                 }).done(function(data){
 
@@ -311,9 +316,9 @@
                             reportFailure(urlObject, title);
                         }
 
-                        $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
-                        $('#urlObject'+index+'.urlObjectLight').css('border', '1px solid '+ borderColour +'');
-                        $('#urlObject'+index+'.urlObjectLight').attr('title', title);
+                        $('#urlObject'+index+' > .urlObjectLight').css('background-color', colour);
+                        $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour +'');
+                        $('#urlObject'+index).attr('title', title);
 
                     }
                     else {
@@ -323,16 +328,16 @@
 
                         var title = titlePrefix + 'No problems detected.';
 
-                        $('#urlObject'+index+'.urlObjectLight').css('background-color', '#2ecc71');
-                        $('#urlObject'+index+'.urlObjectLight').css('border', '1px solid #27ae60');
-                        $('#urlObject'+index+'.urlObjectLight').attr('title', title);
+                        $('#urlObject'+index+' > .urlObjectLight').css('background-color', '#2ecc71');
+                        $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid #27ae60');
+                        $('#urlObject'+index).attr('title', title);
 
                     }
 
                 }).always(function()
                 {
-                    $('#urlObject'+index+'.urlObjectLight').parent().removeClass('scaleIn');
-                    $('#urlObject'+index+'.urlObjectLight').parent().addClass('scaleOut');
+                    $('#urlObject'+index+' > .urlObjectLight').parent().removeClass('scaleIn');
+                    $('#urlObject'+index+' > .urlObjectLight').parent().addClass('scaleOut');
                     doSetTimeout(index, urlObject, false);
 
                 });
