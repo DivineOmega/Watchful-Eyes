@@ -4,22 +4,100 @@
         <title>Watchful Eyes</title>
         <link href="./jquery-ui-1.11.4.custom/jquery-ui.css" rel="stylesheet">
         <style>
+
+            @-webkit-keyframes scaleIn {
+                from {
+                    -webkit-transform: scale(1,1); /* Safari */
+                    transform: scale(1,1);
+                }
+                to {
+                    -webkit-transform: scale(1.1,1.1); /* Safari */
+                    transform: scale(1.1,1.1);
+                }
+            } 
+
+            /* Standard syntax */ 
+            @keyframes mymove {
+                from {
+                    -webkit-transform: scale(1,1); /* Safari */
+                    transform: scale(1,1);
+                }
+                to {
+                    -webkit-transform: scale(1.1,1.1); /* Safari */
+                    transform: scale(1.1,1.1);
+                }
+            }
+
+
             body {
                 margin: 0px;
-                background-color: #333;
+                background-color: #222;
                 font-size: 20px;
             }
 
             #urlObjects {
-                margin: 20px;
+                margin: 16px;
+                text-align: center;
+
+            }
+
+            .scaleIn {
+                animation-name: scaleIn;
+                animation-duration: 0.25s;
+                animation-fill-mode: forwards;
+                -webkit-animation-name: scaleIn;
+                -webkit-animation-duration: 0.25s;
+                -webkit-animation-fill-mode: forwards;
+            }
+
+            .urlObjectParent {
+                background: #ecf0f1;
+                width: 128px;
+                height: 128px;
+                position: relative;
+                float: left;
+                margin-right: 5px;
+                margin-bottom: 5px;
+                text-align: center;
+            }
+
+            .urlObjectParent img {
+                width: 128px;
+                height: 128px;
+            }
+
+            .urlObjectParent:hover {
+                cursor: pointer;
+                z-index: 111;
+                animation-name: scaleIn;
+                animation-duration: 0.25s;
+                animation-fill-mode: forwards;
+                -webkit-animation-name: scaleIn;
+                -webkit-animation-duration: 0.25s;
+                -webkit-animation-fill-mode: forwards;
             }
 
             .urlObjectLight {
-                float: left;
-                width: 40px;
-                height: 40px;
+                width: 32px;
+                height: 32px;
                 background-color: #CCC;
-                border: 1px #333 solid;
+                border-radius: 50%;
+                position: absolute;
+                bottom: 5px;
+                right: 5px;
+            }
+
+            .urlObjectPageName {
+                width: 118px;
+                height: 20px;
+                opacity: 0.8;
+                overflow-y: hidden;
+                position: absolute;
+                top: 5px;
+                left: 5px;
+                font-size: 75%;
+                font-family: sans-serif;
+                background-color: #ccc;
             }
 
             .ui-tooltip {
@@ -38,9 +116,9 @@
       var urlObjectsJSON = null;
 			var urlObjects = [];
 
-            var remote = require('remote');
-            var Menu = remote.require('menu');
-            var MenuItem = remote.require('menu-item');
+            const {remote} = require('electron');
+            const {Menu, MenuItem} = remote;
+
 
             var appMenu = new Menu();
 
@@ -128,7 +206,15 @@
 
                 return requestDelaySeconds * 1000;
             }
-
+            function stripUrl(url) {
+                url = url.split('/'); 
+                url = url[2];
+                if(url.indexOf('www.') == -1) {    
+                    url = 'www.'+url;
+                }
+                return url;
+            };
+            
             function checkUrlObject(index, urlObject)
             {
                 var titlePrefix = '';
@@ -136,8 +222,11 @@
                 titlePrefix += 'Page name: ' + urlObject.pageName + '<br/>'
                 titlePrefix += 'URL: ' + urlObject.url + '<br/><hr/>';
 
+                var placeholderImageUrl = 'https://placeholdit.imgix.net/~text?txtsize=36&txt='+encodeURIComponent(urlObject.siteName)+'&w=128&h=128&txttrack=0';
+
                 if (!$('#urlObject'+index).length) {
-                    $('#urlObjects').append('<div class="urlObjectLight" id="urlObject'+index+'" title="'+titlePrefix+'Not yet checked">');
+                    var imgUrl = stripUrl(urlObject.url);
+                    $('#urlObjects').append('<div class="urlObjectParent" id="urlObject'+index+'" title="'+titlePrefix+' Not yet checked"><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
                 }
 
                 if (typeof urlObject.failures == 'undefined') {
@@ -148,13 +237,25 @@
                     urlObject.startedDate = null;
                 }
 
-                if (typeof urlObject.timeout == 'undefined') {
-                    urlObject.timeout = 3000;
+                if (typeof urlObject.testError == 'undefined') {
+                    urlObject.testError = false;
                 }
 
-                $('#urlObject'+index+'.urlObjectLight').css('border-color', '#CCC');
+                if (urlObject.testError == true) {
+                    urlObject.failures = getFailureCountThreshold();
+                    if (urlObject.startedDate===null) urlObject.startedDate = Date();
+                    var colour = '#e74c3c',
+                    borderColour = '#c0392b';
+                    $('#urlObject'+index+' > .urlObjectLight').css('background-color', colour);
+                    $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour + '');
+                    $('#urlObject'+index).attr('title', "Test error!");
+                    return;
+                }
+                
+                $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid #bdc3c7');
+                $('#urlObject'+index+' > .urlObjectLight').parent().addClass('scaleIn');
 
-                $.ajax({
+                $.ajax({ 
                     url: urlObject.url,
                     timeout: urlObject.timeout
                 }).fail(function(jqXHR, textStatus, errorThrown)
@@ -172,11 +273,13 @@
 
                     title += 'Ocurrences: ' + urlObject.failures + '<br/>';
                     title += 'Started: ' + urlObject.startedDate + '<br/>';
-
-                    var colour = '#c00';
+                    
+                    var colour = '#e74c3c',
+                    borderColour = '#c0392b';
 
                     if (urlObject.failures < getFailureCountThreshold()) {
-                        colour = '#FFA500'
+                        colour = '#e67e22'
+                        borderColour = '#d35400';
                     }
 
                     if (urlObject.failures == getFailureCountThreshold()) {
@@ -186,8 +289,9 @@
                         reportFailure(urlObject, title);
                     }
 
-                    $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
-                    $('#urlObject'+index+'.urlObjectLight').attr('title', title);
+                    $('#urlObject'+index+' > .urlObjectLight').css('background-color', colour);
+                    $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour + '');
+                    $('#urlObject'+index).attr('title', title);
 
                 }).done(function(data){
 
@@ -229,10 +333,12 @@
                         title += 'Ocurrences: ' + urlObject.failures + '<br/>';
                         title += 'Started: ' + urlObject.startedDate + '<br/>';
 
-                        var colour = '#c00';
+                        var colour = '#c0392b',
+                        borderColour = '#c0392b';
 
                         if (urlObject.failures < getFailureCountThreshold()) {
-                            colour = '#FFA500'
+                            colour = '#f39c12'
+                            borderColour = '#d35400';
                         }
 
                         if (urlObject.failures == getFailureCountThreshold()) {
@@ -242,8 +348,9 @@
                             reportFailure(urlObject, title);
                         }
 
-                        $('#urlObject'+index+'.urlObjectLight').css('background-color', colour);
-                        $('#urlObject'+index+'.urlObjectLight').attr('title', title);
+                        $('#urlObject'+index+' > .urlObjectLight').css('background-color', colour);
+                        $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour +'');
+                        $('#urlObject'+index).attr('title', title);
 
                     }
                     else {
@@ -253,16 +360,18 @@
 
                         var title = titlePrefix + 'No problems detected.';
 
-                        $('#urlObject'+index+'.urlObjectLight').css('background-color', '#0c0');
-                        $('#urlObject'+index+'.urlObjectLight').attr('title', title);
+                        $('#urlObject'+index+' > .urlObjectLight').css('background-color', '#2ecc71');
+                        $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid #27ae60');
+                        $('#urlObject'+index).attr('title', title);
 
                     }
 
                 }).always(function()
                 {
-                    $('#urlObject'+index+'.urlObjectLight').css('border-color', '#333');
-
+                    $('#urlObject'+index+' > .urlObjectLight').parent().removeClass('scaleIn');
+                    $('#urlObject'+index+' > .urlObjectLight').parent().addClass('scaleOut');
                     doSetTimeout(index, urlObject, false);
+
                 });
             }
 
@@ -314,6 +423,8 @@
                     try
                     {
                       urlObjects = JSON.parse(urlObjectsJSON);
+
+                      urlObjects.sort(function(a,b) {return (a.siteName > b.siteName) ? 1 : ((b.siteName > a.siteName) ? -1 : 0);} ); 
                     }
                     catch (e)
                     {
