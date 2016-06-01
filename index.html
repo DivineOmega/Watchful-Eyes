@@ -423,6 +423,8 @@
                     try
                     {
                       urlObjects = JSON.parse(urlObjectsJSON);
+
+                      urlObjects.sort(function(a,b) {return (a.siteName > b.siteName) ? 1 : ((b.siteName > a.siteName) ? -1 : 0);} ); 
                     }
                     catch (e)
                     {
