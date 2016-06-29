@@ -112,6 +112,9 @@ Menu.setApplicationMenu(null);
                 var placeholderImageUrl = 'https://placeholdit.imgix.net/~text?txtsize=36&txt='+encodeURIComponent(urlObject.siteName)+'&w=128&h=128&txttrack=0';
 
                 if (!$('#urlObject'+index).length) {
+										if (urlObject.groupId == undefined) {
+											urlObject.groupId = 'ungrouped';
+										}
                     var imgUrl = stripUrl(urlObject.url);
                     $('#urlObjects #'+urlObject.groupId+'Group').append('<div class="urlObjectParent" id="urlObject'+index+'" data-toggle="tooltip" data-html="true" title="'+titlePrefix+' Not yet checked."><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
 										$('#urlObject'+index).hide();
@@ -348,6 +351,8 @@ $.get( "config/groups.json", function( response ) {
       location.reload();
       return;
   }
+
+	groupObjects.push({ "id": "ungrouped", "name": "Ungrouped", "description": "" });
 
   for (var i = 0; i < groupObjects.length; i++) {
       var groupObject = groupObjects[i];
