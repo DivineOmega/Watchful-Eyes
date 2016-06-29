@@ -10,6 +10,7 @@ const {BrowserWindow} = electron;
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
 app.commandLine.appendSwitch('disable-http-cache');
+//app.disableHardwareAcceleration();
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({width: 800, height: 600});
