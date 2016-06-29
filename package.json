@@ -1,4 +1,7 @@
 {
   "name": "Watchful-Eyes",
-  "main": "start.js"
+  "main": "start.js",
+  "devDependencies": {
+    "electron-prebuilt": "^1.2.5"
+  }
 }
