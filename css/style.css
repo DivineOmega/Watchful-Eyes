@@ -83,14 +83,17 @@ body {
     color: #333;
 }
 
-.ui-tooltip {
-    max-width: 1000px !important;
-}
-
 #groupTemplate {
   display: none;
 }
 
 .clear {
   clear: both;
+}
+
+.tooltip-inner  {
+
+    white-space:pre; /* you can also try white-space: normal; */
+    max-width:none;
+
 }
