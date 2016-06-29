@@ -1,2 +1,3 @@
-/config/urls.json
-/config/groups.json
+config/urls.json
+config/groups.json
+node_modules
