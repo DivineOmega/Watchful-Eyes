@@ -10,103 +10,103 @@ var appMenu = new Menu();
 
 Menu.setApplicationMenu(null);
 
-window.$ = window.jQuery = require('./jquery-2.1.4.min.js');
+            window.$ = window.jQuery = require('./jquery-2.1.4.min.js');
 
-//require('./jquery-ui-1.11.4.custom/jquery-ui.js');
+            require('./jquery-ui-1.11.4.custom/jquery-ui.js');
 
-function reportToSlackWebHookUrl(urlObject, text)
-{
-    var payload = {};
-    payload.username = urlObject.siteName + ' status checker';
-    payload.icon_emoji = ':warning:';
+            function reportToSlackWebHookUrl(urlObject, text)
+            {
+                var payload = {};
+                payload.username = urlObject.siteName + ' status checker';
+                payload.icon_emoji = ':warning:';
 
-    text = text.replace(/<br\/>/g, '\n');
-    text = text.replace(/<hr\/>/g, '');
+                text = text.replace(/<br\/>/g, '\n');
+                text = text.replace(/<hr\/>/g, '');
 
-    if (typeof urlObject.slackNotifyEveryone != undefined && urlObject.slackNotifyEveryone == true) {
-        text = '<!everyone>\n' + text;
-        payload.channel = "#general";
-    }
-    else {
-        text = '<!channel>\n' + text;
-    }
+                if (typeof urlObject.slackNotifyEveryone != undefined && urlObject.slackNotifyEveryone == true) {
+                    text = '<!everyone>\n' + text;
+                    payload.channel = "#general";
+                }
+                else {
+                    text = '<!channel>\n' + text;
+                }
 
-    payload.text = text;
+                payload.text = text;
 
-    var jsonPayload = JSON.stringify(payload);
+                var jsonPayload = JSON.stringify(payload);
 
-    $.ajax
-    ({
-        type: "POST",
-        url: urlObject.slackWebHookUrl,
-        dataType: 'json',
-        data: jsonPayload,
-        timeout: 3000,
-        contentType: "application/json; charset=utf-8"
-    });
+                $.ajax
+                ({
+                    type: "POST",
+                    url: urlObject.slackWebHookUrl,
+                    dataType: 'json',
+                    data: jsonPayload,
+                    timeout: 3000,
+                    contentType: "application/json; charset=utf-8"
+                });
 
-}
+            }
 
-function reportFailure(urlObject, text)
-{
-    if (typeof urlObject.slackWebHookUrl != 'undefined') {
-        reportToSlackWebHookUrl(urlObject, text);
-    }
-}
+            function reportFailure(urlObject, text)
+            {
+                if (typeof urlObject.slackWebHookUrl != 'undefined') {
+                    reportToSlackWebHookUrl(urlObject, text);
+                }
+            }
 
-function getFailureCountThreshold()
-{
-    return 3;
-}
+            function getFailureCountThreshold()
+            {
+                return 3;
+            }
 
-function getReportingFrequencyMultiplier()
-{
-    return 10;
-}
+            function getReportingFrequencyMultiplier()
+            {
+                return 10;
+            }
 
-function getErrorText(status, statusText)
-{
-    var errorText = status;
+            function getErrorText(status, statusText)
+            {
+                var errorText = status;
 
-    switch (status)
-    {
-        case 0: errorText = 'Connection error'; break;
+                switch (status)
+                {
+                    case 0: errorText = 'Connection error'; break;
 
-    }
+                }
 
-    errorText += ' (' + statusText + ')'
+                errorText += ' (' + statusText + ')'
 
-    return errorText;
-}
+                return errorText;
+            }
 
-function getRequestDelay()
-{
-    var requestDelaySeconds = 240 + Math.floor(Math.random()*240);
+            function getRequestDelay()
+            {
+                var requestDelaySeconds = 240 + Math.floor(Math.random()*240);
 
-    return requestDelaySeconds * 1000;
-}
+                return requestDelaySeconds * 1000;
+            }
 
-function getInitialRequestDelay(index)
-{
-    var requestDelaySeconds = 1 + (index * 0.5);
+            function getInitialRequestDelay(index)
+            {
+                var requestDelaySeconds = 1 + (index * 0.5);
 
-    return requestDelaySeconds * 1000;
-}
-function stripUrl(url) {
-    url = url.split('/');
-    url = url[2];
-    if(url.indexOf('www.') == -1) {
-        url = 'www.'+url;
-    }
-    return url;
-};
+                return requestDelaySeconds * 200;
+            }
+            function stripUrl(url) {
+                url = url.split('/');
+                url = url[2];
+                if(url.indexOf('www.') == -1) {
+                    url = 'www.'+url;
+                }
+                return url;
+            };
 
 function checkUrlObject(index, urlObject)
 {
     var titlePrefix = '';
     titlePrefix += 'Site name: ' + urlObject.siteName + '<br/>'
     titlePrefix += 'Page name: ' + urlObject.pageName.capitalize() + '<br/>'
-    titlePrefix += 'URL: ' + urlObject.url + '<br/><hr/>';
+    titlePrefix += 'URL: ' + urlObject.url + '<hr/>';
 
     var placeholderImageUrl = 'https://placeholdit.imgix.net/~text?txtsize=36&txt='+encodeURIComponent(urlObject.siteName)+'&w=128&h=128&txttrack=0';
 
@@ -114,7 +114,8 @@ function checkUrlObject(index, urlObject)
         var imgUrl = stripUrl(urlObject.url);
 
         $('#urlObjects #'+urlObject.groupId+'Group').append('<div class="urlObjectParent" id="urlObject'+index+'" data-html="true" data-toggle="tooltip" title="'+titlePrefix+' Not yet checked"><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName.capitalize()+'</div>');
-
+        doSetTimeout(index, urlObject, false);
+        return;
     }
 
     if (typeof urlObject.failures == 'undefined') {
@@ -240,6 +241,7 @@ function checkUrlObject(index, urlObject)
         $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour +'');
         $('#urlObject'+index).attr('title', title);
 
+
     }
     else {
 
@@ -283,18 +285,28 @@ function beginChecks()
    }
 }
 
-function checkIfUrlsConfigChanged()
-{
-    $.get( "config/urls.json", function( response ) {
+function checkIfConfigChanged()
+            {
+                            $.get( "config/groups.json", function( response ) {
 
-        if (urlObjectsJSON != response) {
-            location.reload();
-        }
+                                if (groupsJSON != response) {
+                                        location.reload();
+                                        return;
+                                }
 
-        setTimeout(function() { checkIfUrlsConfigChanged(); }, 5000 );
+                $.get( "config/urls.json", function( response ) {
 
-    }, "text");
-}
+                    if (urlObjectsJSON != response) {
+                        location.reload();
+                                                return;
+                    }
+
+                    setTimeout(function() { checkIfConfigChanged(); }, 5000 );
+
+                }, "text");
+
+                            }, "text");
+            }
 
 $(function () {
   $(document).tooltip({selector: '[data-toggle="tooltip"]'})
@@ -345,12 +357,11 @@ $.get( "config/groups.json", function( response ) {
  }
  beginChecks();
 
- checkIfUrlsConfigChanged();
+ checkIfConfigChanged();
 }, "text");
-});
+}, "text");
+
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
-
-
