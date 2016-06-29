@@ -1,0 +1,85 @@
+@-webkit-keyframes scaleIn {
+    from {
+        -webkit-transform: scale(1,1); /* Safari */
+        transform: scale(1,1);
+    }
+    to {
+        -webkit-transform: scale(1.1,1.1); /* Safari */
+        transform: scale(1.1,1.1);
+    }
+} 
+
+body {
+    margin: 0;
+    background-color: #222;
+    font-size: 20px;
+}
+
+#urlObjects {
+    margin: 16px;
+    text-align: center;
+
+}
+
+.scaleIn {
+    animation-name: scaleIn;
+    animation-duration: 0.25s;
+    animation-fill-mode: forwards;
+    -webkit-animation-name: scaleIn;
+    -webkit-animation-duration: 0.25s;
+    -webkit-animation-fill-mode: forwards;
+}
+
+.urlObjectParent {
+    background: #ecf0f1;
+    width: 128px;
+    height: 128px;
+    position: relative;
+    float: left;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.urlObjectParent img {
+    width: 128px;
+    height: 128px;
+}
+
+.urlObjectParent:hover {
+    cursor: pointer;
+    z-index: 111;
+    animation-name: scaleIn;
+    animation-duration: 0.25s;
+    animation-fill-mode: forwards;
+    -webkit-animation-name: scaleIn;
+    -webkit-animation-duration: 0.25s;
+    -webkit-animation-fill-mode: forwards;
+}
+
+.urlObjectLight {
+    width: 32px;
+    height: 32px;
+    background-color: #CCC;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+
+.urlObjectPageName {
+    width: 118px;
+    height: 20px;
+    opacity: 0.8;
+    overflow-y: hidden;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 75%;
+    font-family: sans-serif;
+    background-color: #ccc;
+}
+
+.ui-tooltip {
+    max-width: 1000px !important;
+}
