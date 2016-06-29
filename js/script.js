@@ -101,19 +101,33 @@ Menu.setApplicationMenu(null);
                 return url;
             };
 
-function checkUrlObject(index, urlObject)
-{
-    var titlePrefix = '';
-    titlePrefix += 'Site name: ' + urlObject.siteName + '<br/>'
-    titlePrefix += 'Page name: ' + urlObject.pageName.capitalize() + '<br/>'
-    titlePrefix += 'URL: ' + urlObject.url + '<hr/>';
 
-    var placeholderImageUrl = 'https://placeholdit.imgix.net/~text?txtsize=36&txt='+encodeURIComponent(urlObject.siteName)+'&w=128&h=128&txttrack=0';
+            function checkUrlObject(index, urlObject)
+            {
+                var titlePrefix = '';
+                titlePrefix += 'Site name: ' + urlObject.siteName + '<br/>'
+                titlePrefix += 'Page name: ' + urlObject.pageName.capitalize() + '<br/>'
+                titlePrefix += 'URL: ' + urlObject.url + '<br/><hr/>';
+
+                var placeholderImageUrl = 'https://placeholdit.imgix.net/~text?txtsize=36&txt='+encodeURIComponent(urlObject.siteName)+'&w=128&h=128&txttrack=0';
+
+                if (!$('#urlObject'+index).length) {
+                    var imgUrl = stripUrl(urlObject.url);
+                    $('#urlObjects #'+urlObject.groupId+'Group').append('<div class="urlObjectParent" id="urlObject'+index+'" data-toggle="tooltip" data-html="true" title="'+titlePrefix+' Not yet checked."><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
+										$('#urlObject'+index).hide();
+										$('#urlObject'+index).fadeIn(1000);
+										doSetTimeout(index, urlObject, false);
+										return;
+								}
+
+                if (typeof urlObject.failures == 'undefined') {
+                    urlObject.failures = 0;
+                }
 
     if (!$('#urlObject'+index).length) {
         var imgUrl = stripUrl(urlObject.url);
 
-        $('#urlObjects #'+urlObject.groupId+'Group').append('<div class="urlObjectParent" id="urlObject'+index+'" data-html="true" data-toggle="tooltip" title="'+titlePrefix+' Not yet checked"><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName.capitalize()+'</div>');
+        $('#urlObjects #'+urlObject.groupId+'Group').append('<div class="urlObjectParent" id="urlObject'+index+'" data-html="true" data-toggle="tooltip" title="'+titlePrefix+' Not yet checked."><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName.capitalize()+'</div>');
         doSetTimeout(index, urlObject, false);
         return;
     }
@@ -182,6 +196,8 @@ function checkUrlObject(index, urlObject)
     $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour + '');
     $('#urlObject'+index).attr('title', title);
 
+    $('#urlObject'+index).fadeIn(1000);
+
 }).done(function(data){
 
     var inpageErrors = [];
@@ -241,6 +257,8 @@ function checkUrlObject(index, urlObject)
         $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour +'');
         $('#urlObject'+index).attr('title', title);
 
+        $('#urlObject'+index).fadeIn(1000);
+
 
     }
     else {
@@ -253,6 +271,9 @@ function checkUrlObject(index, urlObject)
         $('#urlObject'+index+' > .urlObjectLight').css('background-color', '#2ecc71');
         $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid #27ae60');
         $('#urlObject'+index).attr('title', title);
+
+        $('#urlObject'+index).fadeOut(10*1000);
+
 
     }
 

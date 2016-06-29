@@ -92,7 +92,8 @@ body {
 }
 
 .tooltip-inner  {
-
+    text-align: left;
+    font-size: 18px;
     white-space:pre; /* you can also try white-space: normal; */
     max-width:none;
 
