@@ -90,7 +90,7 @@ var groupObjects = [];
             {
                 var requestDelaySeconds = 1 + (index * 0.5);
 
-                return requestDelaySeconds * 1000;
+                return requestDelaySeconds * 200;
             }
             function stripUrl(url) {
                 url = url.split('/');
@@ -113,7 +113,9 @@ var groupObjects = [];
                 if (!$('#urlObject'+index).length) {
                     var imgUrl = stripUrl(urlObject.url);
                     $('#urlObjects #'+urlObject.groupId+'Group').append('<div class="urlObjectParent" id="urlObject'+index+'" title="'+titlePrefix+' Not yet checked"><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
-                }
+										doSetTimeout(index, urlObject, false);
+										return;
+								}
 
                 if (typeof urlObject.failures == 'undefined') {
                     urlObject.failures = 0;
