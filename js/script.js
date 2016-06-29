@@ -113,6 +113,8 @@ var groupObjects = [];
                 if (!$('#urlObject'+index).length) {
                     var imgUrl = stripUrl(urlObject.url);
                     $('#urlObjects #'+urlObject.groupId+'Group').append('<div class="urlObjectParent" id="urlObject'+index+'" title="'+titlePrefix+' Not yet checked"><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
+										$('#urlObject'+index).hide();
+										$('#urlObject'+index).fadeIn(1000);
 										doSetTimeout(index, urlObject, false);
 										return;
 								}
@@ -181,6 +183,8 @@ var groupObjects = [];
                     $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour + '');
                     $('#urlObject'+index).attr('title', title);
 
+										$('#urlObject'+index).fadeIn(1000);
+
                 }).done(function(data){
 
                     var inpageErrors = [];
@@ -240,6 +244,8 @@ var groupObjects = [];
                         $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour +'');
                         $('#urlObject'+index).attr('title', title);
 
+												$('#urlObject'+index).fadeIn(1000);
+
                     }
                     else {
 
@@ -251,6 +257,8 @@ var groupObjects = [];
                         $('#urlObject'+index+' > .urlObjectLight').css('background-color', '#2ecc71');
                         $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid #27ae60');
                         $('#urlObject'+index).attr('title', title);
+
+												$('#urlObject'+index).fadeOut(10*1000);
 
                     }
 
