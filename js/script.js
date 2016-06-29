@@ -281,17 +281,27 @@ var groupObjects = [];
 				}
 			}
 
-            function checkIfUrlsConfigChanged()
+            function checkIfConfigChanged()
             {
+							$.get( "config/groups.json", function( response ) {
+
+								if (groupsJSON != response) {
+										location.reload();
+										return;
+								}
+
                 $.get( "config/urls.json", function( response ) {
 
                     if (urlObjectsJSON != response) {
                         location.reload();
+												return;
                     }
 
-                    setTimeout(function() { checkIfUrlsConfigChanged(); }, 5000 );
+                    setTimeout(function() { checkIfConfigChanged(); }, 5000 );
 
                 }, "text");
+
+							}, "text");
             }
 
             $(document).ready(function(){
@@ -346,8 +356,8 @@ var groupObjects = [];
 	                    }
 	                    beginChecks();
 
-	                    checkIfUrlsConfigChanged();
+	                    checkIfConfigChanged();
 	                }, "text");
-	            	});
+	            	}, "text");
 
 							});
