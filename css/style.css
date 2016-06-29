@@ -7,12 +7,14 @@
         -webkit-transform: scale(1.1,1.1); /* Safari */
         transform: scale(1.1,1.1);
     }
-} 
+}
 
 body {
     margin: 0;
     background-color: #222;
     font-size: 20px;
+    color: #ccc;
+    font-family: sans-serif;
 }
 
 #urlObjects {
@@ -78,8 +80,17 @@ body {
     font-size: 75%;
     font-family: sans-serif;
     background-color: #ccc;
+    color: #333;
 }
 
 .ui-tooltip {
     max-width: 1000px !important;
+}
+
+#groupTemplate {
+  display: none;
+}
+
+.clear {
+  clear: both;
 }

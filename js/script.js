@@ -1,5 +1,7 @@
 var urlObjectsJSON = null;
-			var urlObjects = [];
+var urlObjects = [];
+var groupObjectsJSON = null;
+var groupObjects = [];
 
             const {remote} = require('electron');
             const {Menu, MenuItem} = remote;
@@ -91,14 +93,14 @@ var urlObjectsJSON = null;
                 return requestDelaySeconds * 1000;
             }
             function stripUrl(url) {
-                url = url.split('/'); 
+                url = url.split('/');
                 url = url[2];
-                if(url.indexOf('www.') == -1) {    
+                if(url.indexOf('www.') == -1) {
                     url = 'www.'+url;
                 }
                 return url;
             };
-            
+
             function checkUrlObject(index, urlObject)
             {
                 var titlePrefix = '';
@@ -110,7 +112,7 @@ var urlObjectsJSON = null;
 
                 if (!$('#urlObject'+index).length) {
                     var imgUrl = stripUrl(urlObject.url);
-                    $('#urlObjects').append('<div class="urlObjectParent" id="urlObject'+index+'" title="'+titlePrefix+' Not yet checked"><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
+                    $('#urlObjects #'+urlObject.groupId+'Group').append('<div class="urlObjectParent" id="urlObject'+index+'" title="'+titlePrefix+' Not yet checked"><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
                 }
 
                 if (typeof urlObject.failures == 'undefined') {
@@ -135,11 +137,11 @@ var urlObjectsJSON = null;
                     $('#urlObject'+index).attr('title', "Test error!");
                     return;
                 }
-                
+
                 $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid #bdc3c7');
                 $('#urlObject'+index+' > .urlObjectLight').parent().addClass('scaleIn');
 
-                $.ajax({ 
+                $.ajax({
                     url: urlObject.url,
                     timeout: urlObject.timeout
                 }).fail(function(jqXHR, textStatus, errorThrown)
@@ -157,7 +159,7 @@ var urlObjectsJSON = null;
 
                     title += 'Ocurrences: ' + urlObject.failures + '<br/>';
                     title += 'Started: ' + urlObject.startedDate + '<br/>';
-                    
+
                     var colour = '#e74c3c',
                     borderColour = '#c0392b';
 
@@ -300,24 +302,52 @@ var urlObjectsJSON = null;
                     }
                 });
 
-                $.get( "config/urls.json", function( response ) {
+								$.get( "config/groups.json", function( response ) {
 
-                    urlObjectsJSON = response;
+									groupsJSON = response;
 
-                    try
-                    {
-                      urlObjects = JSON.parse(urlObjectsJSON);
+									try
+									{
+										groupObjects = JSON.parse(groupsJSON);
+									}
+									catch (e)
+									{
+										alert('Your `groups.json` file could not be parsed. \nPlease check its syntax. \n\nDetails: '+e.message);
+										location.reload();
+										return;
+									}
 
-                      urlObjects.sort(function(a,b) {return (a.siteName > b.siteName) ? 1 : ((b.siteName > a.siteName) ? -1 : 0);} ); 
-                    }
-                    catch (e)
-                    {
-                      alert('Your `urls.json` file could not be parsed. \nPlease check its syntax. \n\nDetails: '+e.message);
-                      location.reload();
-                      return;
-                    }
-                    beginChecks();
+									for (var i = 0; i < groupObjects.length; i++) {
+										var groupObject = groupObjects[i];
 
-                    checkIfUrlsConfigChanged();
-                }, "text");
-            });
+										var templateHTML = $('#groupTemplate').html();
+										templateHTML = templateHTML.replace('[[id]]', groupObject.id);
+										templateHTML = templateHTML.replace('[[name]]', groupObject.name);
+										templateHTML = templateHTML.replace('[[description]]', groupObject.description);
+
+										$('#urlObjects').append(templateHTML);
+									}
+
+	                $.get( "config/urls.json", function( response ) {
+
+	                    urlObjectsJSON = response;
+
+	                    try
+	                    {
+	                      urlObjects = JSON.parse(urlObjectsJSON);
+
+	                      urlObjects.sort(function(a,b) {return (a.siteName > b.siteName) ? 1 : ((b.siteName > a.siteName) ? -1 : 0);} );
+	                    }
+	                    catch (e)
+	                    {
+	                      alert('Your `urls.json` file could not be parsed. \nPlease check its syntax. \n\nDetails: '+e.message);
+	                      location.reload();
+	                      return;
+	                    }
+	                    beginChecks();
+
+	                    checkIfUrlsConfigChanged();
+	                }, "text");
+	            	});
+
+							});
