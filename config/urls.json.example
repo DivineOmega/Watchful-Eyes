@@ -1,27 +1,33 @@
 [
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://jordanhall.co.uk/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.google.com/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://bbc.co.uk/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://getbootstrap.com/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.ebay.com/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://jordanhall.co.uk/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.getbootstrap.com/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://jordanhall.co.uk/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.google.com/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://jordanhall.co.uk/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.google.com/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://jordanhall.co.uk/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.google.com/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://jordanhall.co.uk/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.google.com/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://jordanhall.co.uk/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.google.com/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://jordanhall.co.uk/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.google.com/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://jordanhall.co.uk/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.google.com/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://jordanhall.co.uk/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.google.com/" },
-    { "siteName": "Jordan Hall", "pageName": "Homepage", "url": "http://jordanhall.co.uk/" },
-    { "siteName": "Example.com", "pageName": "Homepage", "url": "http://www.google.com/", "testError": true }
+  {
+    "siteName": "Jordan Hall",
+    "groupId": "srv1",
+    "pageName": "Homepage",
+    "url": "http://jordanhall.co.uk/"
+  },
+  {
+    "siteName": "Example.com",
+    "groupId": "srv1",
+    "pageName": "Homepage",
+    "url": "http://www.example.com/",
+    "testError": true
+  },
+  {
+    "siteName": "BBC",
+    "groupId": "srv2",
+    "pageName": "Homepage",
+    "url": "http://bbc.co.uk/"
+  },
+  {
+    "siteName": "Bootstrap",
+    "groupId": "srv2",
+    "pageName": "Homepage",
+    "url": "http://getbootstrap.com/"
+    },
+  {
+    "siteName": "Example.com",
+    "groupId": "dev1",
+    "pageName": "Homepage",
+    "url": "http://www.ebay.com/"
+  }
 ]
