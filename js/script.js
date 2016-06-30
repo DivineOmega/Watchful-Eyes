@@ -12,8 +12,6 @@ Menu.setApplicationMenu(null);
 
             window.$ = window.jQuery = require('./jquery-2.1.4.min.js');
 
-            require('./jquery-ui-1.11.4.custom/jquery-ui.js');
-
             function reportToSlackWebHookUrl(urlObject, text)
             {
                 var payload = {};
@@ -116,24 +114,13 @@ Menu.setApplicationMenu(null);
 											urlObject.groupId = 'ungrouped';
 										}
                     var imgUrl = stripUrl(urlObject.url);
-                    $('#urlObjects #'+urlObject.groupId+'Group').append('<div class="urlObjectParent" id="urlObject'+index+'" data-toggle="tooltip" data-html="true" title="'+titlePrefix+' Not yet checked."><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
+                    $('#urlObjects #'+urlObject.groupId+'Group .sites').append('<div class="urlObjectParent" id="urlObject'+index+'" data-toggle="tooltip" data-placement="auto" data-html="true" title="'+titlePrefix+' Not yet checked."><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
 										$('#urlObject'+index).hide();
 										$('#urlObject'+index).fadeIn(1000);
 										doSetTimeout(index, urlObject, false);
 										return;
 								}
 
-                if (typeof urlObject.failures == 'undefined') {
-                    urlObject.failures = 0;
-                }
-
-    if (!$('#urlObject'+index).length) {
-        var imgUrl = stripUrl(urlObject.url);
-
-        $('#urlObjects #'+urlObject.groupId+'Group').append('<div class="urlObjectParent" id="urlObject'+index+'" data-html="true" data-toggle="tooltip" title="'+titlePrefix+' Not yet checked."><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName.capitalize()+'</div>');
-        doSetTimeout(index, urlObject, false);
-        return;
-    }
 
     if (typeof urlObject.failures == 'undefined') {
         urlObject.failures = 0;

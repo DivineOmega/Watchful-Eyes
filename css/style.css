@@ -13,13 +13,13 @@ body {
     margin: 0;
     background-color: #222;
     font-size: 20px;
-    color: #ccc;
+    color: #333;
     font-family: sans-serif;
 }
 
 #urlObjects {
     margin: 16px;
-    text-align: center;
+    text-align: left;
 
 }
 
