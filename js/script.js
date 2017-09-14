@@ -134,6 +134,10 @@ Menu.setApplicationMenu(null);
         urlObject.testError = false;
     }
 
+    if (typeof urlObject.timeout == 'undefined' || urlObject.timeout <= 0 ) {
+        urlObject.timeout = 3000;
+    }
+
     if (urlObject.testError == true) {
         urlObject.failures = getFailureCountThreshold();
         if (urlObject.startedDate===null) urlObject.startedDate = Date();
