@@ -1,0 +1,20 @@
+{
+  "name": "watchful-eyes",
+  "description": "A JavaScript powered site monitor",
+  "main": "start.js",
+  "authors": [
+    "Jordan Hall <jordan.hall@rapidweb.biz>"
+  ],
+  "license": "LGPLv3",
+  "homepage": "https://github.com/DivineOmega/jsCheck",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "rapid-screensaver": "*"
+  }
+}
