@@ -3,123 +3,114 @@ var urlObjects = [];
 var groupObjectsJSON = null;
 var groupObjects = [];
 
-const {remote} = require('electron');
-const {Menu, MenuItem} = remote;
+const { remote } = require('electron');
+const { Menu, MenuItem } = remote;
 
 var appMenu = new Menu();
 
 Menu.setApplicationMenu(null);
 
-            window.$ = window.jQuery = require('./jquery-2.1.4.min.js');
+window.$ = window.jQuery = require('./jquery-2.1.4.min.js');
 
-            function reportToSlackWebHookUrl(urlObject, text)
-            {
-                var payload = {};
-                payload.username = urlObject.siteName + ' status checker';
-                payload.icon_emoji = ':warning:';
+function reportToSlackWebHookUrl(urlObject, text) {
+    var payload = {};
+    payload.username = urlObject.siteName + ' status checker';
+    payload.icon_emoji = ':warning:';
 
-                text = text.replace(/<br\/>/g, '\n');
-                text = text.replace(/<hr\/>/g, '');
+    text = text.replace(/<br\/>/g, '\n');
+    text = text.replace(/<hr\/>/g, '');
 
-                if (typeof urlObject.slackNotifyEveryone != undefined && urlObject.slackNotifyEveryone == true) {
-                    text = '<!everyone>\n' + text;
-                    payload.channel = "#general";
-                }
-                else {
-                    text = '<!channel>\n' + text;
-                }
+    if (typeof urlObject.slackNotifyEveryone != undefined && urlObject.slackNotifyEveryone == true) {
+        text = '<!everyone>\n' + text;
+        payload.channel = "#general";
+    }
+    else {
+        text = '<!channel>\n' + text;
+    }
 
-                payload.text = text;
+    payload.text = text;
 
-                var jsonPayload = JSON.stringify(payload);
+    var jsonPayload = JSON.stringify(payload);
 
-                $.ajax
-                ({
-                    type: "POST",
-                    url: urlObject.slackWebHookUrl,
-                    dataType: 'json',
-                    data: jsonPayload,
-                    timeout: 3000,
-                    contentType: "application/json; charset=utf-8"
-                });
+    $.ajax
+        ({
+            type: "POST",
+            url: urlObject.slackWebHookUrl,
+            dataType: 'json',
+            data: jsonPayload,
+            timeout: 3000,
+            contentType: "application/json; charset=utf-8"
+        });
 
-            }
+}
 
-            function reportFailure(urlObject, text)
-            {
-                if (typeof urlObject.slackWebHookUrl != 'undefined') {
-                    reportToSlackWebHookUrl(urlObject, text);
-                }
-            }
+function reportFailure(urlObject, text) {
+    if (typeof urlObject.slackWebHookUrl != 'undefined') {
+        reportToSlackWebHookUrl(urlObject, text);
+    }
+}
 
-            function getFailureCountThreshold()
-            {
-                return 3;
-            }
+function getFailureCountThreshold() {
+    return 3;
+}
 
-            function getReportingFrequencyMultiplier()
-            {
-                return 10;
-            }
+function getReportingFrequencyMultiplier() {
+    return 10;
+}
 
-            function getErrorText(status, statusText)
-            {
-                var errorText = status;
+function getErrorText(status, statusText) {
+    var errorText = status;
 
-                switch (status)
-                {
-                    case 0: errorText = 'Connection error'; break;
+    switch (status) {
+        case 0: errorText = 'Connection error'; break;
 
-                }
+    }
 
-                errorText += ' (' + statusText + ')'
+    errorText += ' (' + statusText + ')'
 
-                return errorText;
-            }
+    return errorText;
+}
 
-            function getRequestDelay()
-            {
-                var requestDelaySeconds = 240 + Math.floor(Math.random()*240);
+function getRequestDelay() {
+    var requestDelaySeconds = 240 + Math.floor(Math.random() * 240);
 
-                return requestDelaySeconds * 1000;
-            }
+    return requestDelaySeconds * 1000;
+}
 
-            function getInitialRequestDelay(index)
-            {
-                var requestDelaySeconds = 1 + (index * 0.5);
+function getInitialRequestDelay(index) {
+    var requestDelaySeconds = 1 + (index * 0.5);
 
-                return requestDelaySeconds * 200;
-            }
-            function stripUrl(url) {
-                url = url.split('/');
-                url = url[2];
-                if(url.indexOf('www.') == -1) {
-                    url = 'www.'+url;
-                }
-                return url;
-            };
+    return requestDelaySeconds * 200;
+}
+function stripUrl(url) {
+    url = url.split('/');
+    url = url[2];
+    if (url.indexOf('www.') == -1) {
+        url = 'www.' + url;
+    }
+    return url;
+};
 
 
-            function checkUrlObject(index, urlObject)
-            {
-                var titlePrefix = '';
-                titlePrefix += 'Site name: ' + urlObject.siteName + '<br/>'
-                titlePrefix += 'Page name: ' + urlObject.pageName.capitalize() + '<br/>'
-                titlePrefix += 'URL: ' + urlObject.url + '<br/><hr/>';
+function checkUrlObject(index, urlObject) {
+    var titlePrefix = '';
+    titlePrefix += 'Site name: ' + urlObject.siteName + '<br/>'
+    titlePrefix += 'Page name: ' + urlObject.pageName.capitalize() + '<br/>'
+    titlePrefix += 'URL: ' + urlObject.url + '<br/><hr/>';
 
-                var placeholderImageUrl = 'https://placeholdit.imgix.net/~text?txtsize=36&txt='+encodeURIComponent(urlObject.siteName)+'&w=128&h=128&txttrack=0';
+    var placeholderImageUrl = 'https://placeholdit.imgix.net/~text?txtsize=36&txt=' + encodeURIComponent(urlObject.siteName) + '&w=128&h=128&txttrack=0';
 
-                if (!$('#urlObject'+index).length) {
-										if (urlObject.groupId == undefined) {
-											urlObject.groupId = 'ungrouped';
-										}
-                    var imgUrl = stripUrl(urlObject.url);
-                    $('#urlObjects #'+urlObject.groupId+'Group .sites').append('<div class="urlObjectParent" id="urlObject'+index+'" data-toggle="tooltip" data-placement="auto" data-html="true" title="'+titlePrefix+' Not yet checked."><img src="https://logo.clearbit.com/'+imgUrl+'" onerror="this.src=\''+placeholderImageUrl+'\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">'+urlObject.pageName+'</div>');
-										$('#urlObject'+index).hide();
-										$('#urlObject'+index).fadeIn(1000);
-										doSetTimeout(index, urlObject, false);
-										return;
-								}
+    if (!$('#urlObject' + index).length) {
+        if (urlObject.groupId == undefined) {
+            urlObject.groupId = 'ungrouped';
+        }
+        var imgUrl = stripUrl(urlObject.url);
+        $('#urlObjects #' + urlObject.groupId + 'Group .sites').append('<div class="urlObjectParent" id="urlObject' + index + '" data-toggle="tooltip" data-placement="auto" data-html="true" title="' + titlePrefix + ' Not yet checked."><img src="https://logo.clearbit.com/' + imgUrl + '" onerror="this.src=\'' + placeholderImageUrl + '\'"><div class="urlObjectLight"  ></div><div class="urlObjectPageName">' + urlObject.pageName + '</div>');
+        $('#urlObject' + index).hide();
+        $('#urlObject' + index).fadeIn(1000);
+        doSetTimeout(index, urlObject, false);
+        return;
+    }
 
 
     if (typeof urlObject.failures == 'undefined') {
@@ -134,150 +125,147 @@ Menu.setApplicationMenu(null);
         urlObject.testError = false;
     }
 
-    if (typeof urlObject.timeout == 'undefined' || urlObject.timeout <= 0 ) {
+    if (typeof urlObject.timeout == 'undefined' || urlObject.timeout <= 0) {
         urlObject.timeout = 3000;
     }
 
     if (urlObject.testError == true) {
         urlObject.failures = getFailureCountThreshold();
-        if (urlObject.startedDate===null) urlObject.startedDate = Date();
+        if (urlObject.startedDate === null) urlObject.startedDate = Date();
         var colour = '#e74c3c',
-        borderColour = '#c0392b';
-        $('#urlObject'+index+' > .urlObjectLight').css('background-color', colour);
-        $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour + '');
-        $('#urlObject'+index).attr('title', "Test error!");
+            borderColour = '#c0392b';
+        $('#urlObject' + index + ' > .urlObjectLight').css('background-color', colour);
+        $('#urlObject' + index + ' > .urlObjectLight').css('border', '1px solid ' + borderColour + '');
+        $('#urlObject' + index).attr('title', "Test error!");
         return;
     }
 
-    $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid #bdc3c7');
-    $('#urlObject'+index+' > .urlObjectLight').parent().addClass('scaleIn');
+    $('#urlObject' + index + ' > .urlObjectLight').css('border', '1px solid #bdc3c7');
+    $('#urlObject' + index + ' > .urlObjectLight').parent().addClass('scaleIn');
 
     $.ajax({
         url: urlObject.url,
         timeout: urlObject.timeout
-    }).fail(function(jqXHR, textStatus, errorThrown)
-    {
+    }).fail(function (jqXHR, textStatus, errorThrown) {
         urlObject.failures++;
-        if (urlObject.startedDate===null) urlObject.startedDate = Date();
+        if (urlObject.startedDate === null) urlObject.startedDate = Date();
 
         var title = titlePrefix;
-        title += 'Problem: '+ getErrorText(jqXHR.status, jqXHR.statusText) + '<br/>';
+        title += 'Problem: ' + getErrorText(jqXHR.status, jqXHR.statusText) + '<br/>';
 
-        if (jqXHR.statusText=='timeout')
-        {
-          title += 'Timeout setting: ' + (urlObject.timeout / 1000) + ' seconds<br/>';
-      }
-
-      title += 'Ocurrences: ' + urlObject.failures + '<br/>';
-      title += 'Started: ' + urlObject.startedDate + '<br/>';
-
-      var colour = '#e74c3c',
-      borderColour = '#c0392b';
-
-      if (urlObject.failures < getFailureCountThreshold()) {
-        colour = '#e67e22'
-        borderColour = '#d35400';
-    }
-
-    if (urlObject.failures == getFailureCountThreshold()) {
-        reportFailure(urlObject, title);
-    }
-    else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold()*getReportingFrequencyMultiplier()) == 0) {
-        reportFailure(urlObject, title);
-    }
-
-    $('#urlObject'+index+' > .urlObjectLight').css('background-color', colour);
-    $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour + '');
-    $('#urlObject'+index).attr('title', title);
-
-    $('#urlObject'+index).fadeIn(1000);
-
-}).done(function(data){
-
-    var inpageErrors = [];
-
-    var minPageSize = 1024 * 1;
-
-    if (data.indexOf('Deprecated') > -1 && data.indexOf(' on line ') > -1) {
-        inpageErrors.push('PHP Deprecated');
-    }
-
-    if (data.indexOf('Notice') > -1 && data.indexOf(' on line ') > -1) {
-        inpageErrors.push('PHP Notice');
-    }
-
-    if (data.indexOf('Warning') > -1 && data.indexOf(' on line ') > -1) {
-        inpageErrors.push('PHP Warning');
-    }
-
-    if (data.indexOf('Fatal error') > -1 && data.indexOf(' on line ') > -1) {
-        inpageErrors.push('PHP Fatal Error');
-    }
-
-    if (data.length<minPageSize) {
-        inpageErrors.push('Page size is below '+minPageSize+' bytes.');
-    }
-
-    if (inpageErrors.length>0) {
-
-        urlObject.failures++;
-        if (urlObject.startedDate===null) urlObject.startedDate = Date();
-
-        var title = titlePrefix;
-
-        for (var i = 0; i < inpageErrors.length; i++) {
-            title += 'Problem '+(i+1)+': '+ inpageErrors[i] + '<br/>';
+        if (jqXHR.statusText == 'timeout') {
+            title += 'Timeout setting: ' + (urlObject.timeout / 1000) + ' seconds<br/>';
         }
 
         title += 'Ocurrences: ' + urlObject.failures + '<br/>';
         title += 'Started: ' + urlObject.startedDate + '<br/>';
 
-        var colour = '#c0392b',
-        borderColour = '#c0392b';
+        var colour = '#e74c3c',
+            borderColour = '#c0392b';
 
         if (urlObject.failures < getFailureCountThreshold()) {
-            colour = '#f39c12'
+            colour = '#e67e22'
             borderColour = '#d35400';
         }
 
         if (urlObject.failures == getFailureCountThreshold()) {
             reportFailure(urlObject, title);
         }
-        else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold()*getReportingFrequencyMultiplier()) == 0) {
+        else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold() * getReportingFrequencyMultiplier()) == 0) {
             reportFailure(urlObject, title);
         }
 
-        $('#urlObject'+index+' > .urlObjectLight').css('background-color', colour);
-        $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid '+ borderColour +'');
-        $('#urlObject'+index).attr('title', title);
+        $('#urlObject' + index + ' > .urlObjectLight').css('background-color', colour);
+        $('#urlObject' + index + ' > .urlObjectLight').css('border', '1px solid ' + borderColour + '');
+        $('#urlObject' + index).attr('title', title);
 
-        $('#urlObject'+index).fadeIn(1000);
+        $('#urlObject' + index).fadeIn(1000);
+
+    }).done(function (data) {
+
+        var inpageErrors = [];
+
+        var minPageSize = 1024 * 1;
+
+        if (data.indexOf('Deprecated') > -1 && data.indexOf(' on line ') > -1) {
+            inpageErrors.push('PHP Deprecated');
+        }
+
+        if (data.indexOf('Notice') > -1 && data.indexOf(' on line ') > -1) {
+            inpageErrors.push('PHP Notice');
+        }
+
+        if (data.indexOf('Warning') > -1 && data.indexOf(' on line ') > -1) {
+            inpageErrors.push('PHP Warning');
+        }
+
+        if (data.indexOf('Fatal error') > -1 && data.indexOf(' on line ') > -1) {
+            inpageErrors.push('PHP Fatal Error');
+        }
+
+        if (data.length < minPageSize) {
+            inpageErrors.push('Page size is below ' + minPageSize + ' bytes.');
+        }
+
+        if (inpageErrors.length > 0) {
+
+            urlObject.failures++;
+            if (urlObject.startedDate === null) urlObject.startedDate = Date();
+
+            var title = titlePrefix;
+
+            for (var i = 0; i < inpageErrors.length; i++) {
+                title += 'Problem ' + (i + 1) + ': ' + inpageErrors[i] + '<br/>';
+            }
+
+            title += 'Ocurrences: ' + urlObject.failures + '<br/>';
+            title += 'Started: ' + urlObject.startedDate + '<br/>';
+
+            var colour = '#c0392b',
+                borderColour = '#c0392b';
+
+            if (urlObject.failures < getFailureCountThreshold()) {
+                colour = '#f39c12'
+                borderColour = '#d35400';
+            }
+
+            if (urlObject.failures == getFailureCountThreshold()) {
+                reportFailure(urlObject, title);
+            }
+            else if (urlObject.failures > getFailureCountThreshold() && urlObject.failures % (getFailureCountThreshold() * getReportingFrequencyMultiplier()) == 0) {
+                reportFailure(urlObject, title);
+            }
+
+            $('#urlObject' + index + ' > .urlObjectLight').css('background-color', colour);
+            $('#urlObject' + index + ' > .urlObjectLight').css('border', '1px solid ' + borderColour + '');
+            $('#urlObject' + index).attr('title', title);
+
+            $('#urlObject' + index).fadeIn(1000);
 
 
-    }
-    else {
+        }
+        else {
 
-        urlObject.failures = 0;
-        urlObject.startedDate = null;
+            urlObject.failures = 0;
+            urlObject.startedDate = null;
 
-        var title = titlePrefix + 'No problems detected.';
+            var title = titlePrefix + 'No problems detected.';
 
-        $('#urlObject'+index+' > .urlObjectLight').css('background-color', '#2ecc71');
-        $('#urlObject'+index+' > .urlObjectLight').css('border', '1px solid #27ae60');
-        $('#urlObject'+index).attr('title', title);
+            $('#urlObject' + index + ' > .urlObjectLight').css('background-color', '#2ecc71');
+            $('#urlObject' + index + ' > .urlObjectLight').css('border', '1px solid #27ae60');
+            $('#urlObject' + index).attr('title', title);
 
-        $('#urlObject'+index).fadeOut(10*1000);
+            $('#urlObject' + index).fadeOut(10 * 1000);
 
 
-    }
+        }
 
-}).always(function()
-{
-    $('#urlObject'+index+' > .urlObjectLight').parent().removeClass('scaleIn');
-    $('#urlObject'+index+' > .urlObjectLight').parent().addClass('scaleOut');
-    doSetTimeout(index, urlObject, false);
+    }).always(function () {
+        $('#urlObject' + index + ' > .urlObjectLight').parent().removeClass('scaleIn');
+        $('#urlObject' + index + ' > .urlObjectLight').parent().addClass('scaleOut');
+        doSetTimeout(index, urlObject, false);
 
-});
+    });
 }
 
 function doSetTimeout(index, urlObject, initial) {
@@ -285,100 +273,94 @@ function doSetTimeout(index, urlObject, initial) {
     var delay = null;
 
     if (initial) {
-       delay = getInitialRequestDelay(index);
-   } else {
-       delay = getRequestDelay();
-   }
+        delay = getInitialRequestDelay(index);
+    } else {
+        delay = getRequestDelay();
+    }
 
-   setTimeout(function() { checkUrlObject(index, urlObject); }, delay);
+    setTimeout(function () { checkUrlObject(index, urlObject); }, delay);
 }
 
-function beginChecks()
-{
+function beginChecks() {
     for (var i = 0; i < urlObjects.length; ++i) {
-       doSetTimeout(i, urlObjects[i], true);
-   }
+        doSetTimeout(i, urlObjects[i], true);
+    }
 }
 
-function checkIfConfigChanged()
-            {
-                            $.get( "config/groups.json", function( response ) {
+function checkIfConfigChanged() {
+    $.get("config/groups.json", function (response) {
 
-                                if (groupsJSON != response) {
-                                        location.reload();
-                                        return;
-                                }
+        if (groupsJSON != response) {
+            location.reload();
+            return;
+        }
 
-                $.get( "config/urls.json", function( response ) {
+        $.get("config/urls.json", function (response) {
 
-                    if (urlObjectsJSON != response) {
-                        location.reload();
-                                                return;
-                    }
-
-                    setTimeout(function() { checkIfConfigChanged(); }, 5000 );
-
-                }, "text");
-
-                            }, "text");
+            if (urlObjectsJSON != response) {
+                location.reload();
+                return;
             }
 
+            setTimeout(function () { checkIfConfigChanged(); }, 5000);
+
+        }, "text");
+
+    }, "text");
+}
+
 $(function () {
-  $(document).tooltip({selector: '[data-toggle="tooltip"]'})
+    $(document).tooltip({ selector: '[data-toggle="tooltip"]' })
 })
 
 
-$.get( "config/groups.json", function( response ) {
+$.get("config/groups.json", function (response) {
 
-   groupsJSON = response;
+    groupsJSON = response;
 
-   try
-   {
-      groupObjects = JSON.parse(groupsJSON);
-  }
-  catch (e)
-  {
-      alert('Your `groups.json` file could not be parsed. \nPlease check its syntax. \n\nDetails: '+e.message);
-      location.reload();
-      return;
-  }
+    try {
+        groupObjects = JSON.parse(groupsJSON);
+    }
+    catch (e) {
+        alert('Your `groups.json` file could not be parsed. \nPlease check its syntax. \n\nDetails: ' + e.message);
+        location.reload();
+        return;
+    }
 
-	groupObjects.push({ "id": "ungrouped", "name": "Ungrouped", "description": "" });
+    groupObjects.push({ "id": "ungrouped", "name": "Ungrouped", "description": "" });
 
-  for (var i = 0; i < groupObjects.length; i++) {
-      var groupObject = groupObjects[i];
+    for (var i = 0; i < groupObjects.length; i++) {
+        var groupObject = groupObjects[i];
 
-      var templateHTML = $('#groupTemplate').html();
-      templateHTML = templateHTML.replace('[[id]]', groupObject.id);
-      templateHTML = templateHTML.replace('[[name]]', groupObject.name);
-      templateHTML = templateHTML.replace('[[description]]', groupObject.description);
+        var templateHTML = $('#groupTemplate').html();
+        templateHTML = templateHTML.replace('[[id]]', groupObject.id);
+        templateHTML = templateHTML.replace('[[name]]', groupObject.name);
+        templateHTML = templateHTML.replace('[[description]]', groupObject.description);
 
-      $('#urlObjects').append(templateHTML);
-  }
+        $('#urlObjects').append(templateHTML);
+    }
 
-  $.get( "config/urls.json", function( response ) {
+    $.get("config/urls.json", function (response) {
 
-   urlObjectsJSON = response;
+        urlObjectsJSON = response;
 
-   try
-   {
-     urlObjects = JSON.parse(urlObjectsJSON);
+        try {
+            urlObjects = JSON.parse(urlObjectsJSON);
 
-     urlObjects.sort(function(a,b) {return (a.siteName > b.siteName) ? 1 : ((b.siteName > a.siteName) ? -1 : 0);} );
- }
- catch (e)
- {
-     alert('Your `urls.json` file could not be parsed. \nPlease check its syntax. \n\nDetails: '+e.message);
-     location.reload();
-     return;
- }
- beginChecks();
+            urlObjects.sort(function (a, b) { return (a.siteName > b.siteName) ? 1 : ((b.siteName > a.siteName) ? -1 : 0); });
+        }
+        catch (e) {
+            alert('Your `urls.json` file could not be parsed. \nPlease check its syntax. \n\nDetails: ' + e.message);
+            location.reload();
+            return;
+        }
+        beginChecks();
 
- checkIfConfigChanged();
-}, "text");
+        checkIfConfigChanged();
+    }, "text");
 }, "text");
 
 
-String.prototype.capitalize = function() {
+String.prototype.capitalize = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
