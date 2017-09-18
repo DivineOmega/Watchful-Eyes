@@ -1,7 +1,9 @@
 {
-  "name": "Watchful-Eyes",
+  "name": "watchful-eyes",
+  "description": "A JavaScript powered site monitor",
   "main": "start.js",
-  "devDependencies": {
-    "electron-prebuilt": "^1.2.5"
-  }
+  "dependencies": {
+    "electron": "^1.2.5"
+  },
+  "license": "LGPLv3"
 }
