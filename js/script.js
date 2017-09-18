@@ -20,7 +20,7 @@ function reportToSlackWebHookUrl(urlObject, text) {
     text = text.replace(/<br\/>/g, '\n');
     text = text.replace(/<hr\/>/g, '');
 
-    if (typeof urlObject.slackNotifyEveryone != undefined && urlObject.slackNotifyEveryone == true) {
+    if (typeof urlObject.slackNotifyEveryone != 'undefined' && urlObject.slackNotifyEveryone == true) {
         text = '<!everyone>\n' + text;
         payload.channel = "#general";
     }
@@ -101,7 +101,7 @@ function checkUrlObject(index, urlObject) {
     var placeholderImageUrl = 'https://placeholdit.imgix.net/~text?txtsize=36&txt=' + encodeURIComponent(urlObject.siteName) + '&w=128&h=128&txttrack=0';
 
     if (!$('#urlObject' + index).length) {
-        if (urlObject.groupId == undefined) {
+        if (typeof urlObject.groupId == 'undefined') {
             urlObject.groupId = 'ungrouped';
         }
         var imgUrl = stripUrl(urlObject.url);
@@ -261,11 +261,41 @@ function checkUrlObject(index, urlObject) {
         }
 
     }).always(function () {
+
         $('#urlObject' + index + ' > .urlObjectLight').parent().removeClass('scaleIn');
         $('#urlObject' + index + ' > .urlObjectLight').parent().addClass('scaleOut');
+
+        setScreensaverVisibleIfNeeded();
+
         doSetTimeout(index, urlObject, false);
 
     });
+}
+
+function setScreensaverVisibleIfNeeded() {
+
+    for (var index = 0; index < urlObjects.length; index++) {
+        var urlObject = urlObjects[index];
+
+        if (typeof urlObject.failures == 'undefined') {
+            return;
+        }
+
+        if (urlObject.failures > 0) {
+            setScreensaverVisible(false);
+            return;
+        }
+    }
+
+    setScreensaverVisible(true);
+}
+
+function setScreensaverVisible(visible) {
+    if (visible) {
+        $('#screensaver').fadeIn(10 * 1000);
+    } else {
+        $('#screensaver').fadeOut(500);
+    }
 }
 
 function doSetTimeout(index, urlObject, initial) {
@@ -359,7 +389,6 @@ $.get("config/groups.json", function (response) {
         checkIfConfigChanged();
     }, "text");
 }, "text");
-
 
 String.prototype.capitalize = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
