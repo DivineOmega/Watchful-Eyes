@@ -78,9 +78,9 @@ function getRequestDelay() {
 }
 
 function getInitialRequestDelay(index) {
-    var requestDelaySeconds = 1 + (index * 0.5);
+    var requestDelay = 1 + (index * 0.5);
 
-    return requestDelaySeconds * 200;
+    return requestDelay * 200;
 }
 function stripUrl(url) {
     url = url.split('/');
